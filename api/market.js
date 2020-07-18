@@ -182,14 +182,13 @@ router.post("/get_avg_prices_for_date", (req, res) => {
 	`;
 
 	const values = [startDate.unix(), endDate.unix(), body.marketId]
-	console.log(startDate, endDate)
-  pool.query(query, values, (error, results) => {
+
+	pool.query(query, values, (error, results) => {
     if (error) {
       console.error(error)
       res.status(404).json(error)
 		}
 
-		// console.log(results)
     res.status(200).json(results.rows);
 	})
 }); 

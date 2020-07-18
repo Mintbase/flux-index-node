@@ -20,14 +20,12 @@ router.post("/get_avg_price_per_date_metric", (req, res) => {
 
 	const values = [body.dateMetric, startDate.unix(), endDate.unix(), body.marketId]
 
-	 console.log(values);
 	pool.query(query, values, (error, results) => {
     if (error) {
       console.error(error)
       res.status(404).json(error)
 		}
 
-		// console.log(results)
     res.status(200).json(results.rows);
 	})
 }); 
