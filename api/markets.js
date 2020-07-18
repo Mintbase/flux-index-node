@@ -6,18 +6,19 @@ router.post("/get", async (req, res) => {
 	const {pool, body} = req;
 
 	let whereString = "";
+	const categoryValues = [] // [categories[0], ...items]
 	if (body.filter && body.filter.categories) {
-		console.log("get here", body.filter.categories)
 		whereString = body.filter.categories.reduce((collector, item, index) => {
+			categoryValues.push(body.filter.categories[index]);
 			if (index == 0 ) return collector;
-			return collector + ` OR '${item}' = ANY (markets.categories)`
-		},  `WHERE  '${body.filter.categories[0]}' = ANY(markets.categories)`)
+			return collector + ` OR $${index + 1} = ANY (markets.categories)`
+		},  `WHERE  $1 = ANY(markets.categories)`)
 	}
-
 	let limit = body.limit || 20;
-	let limitString = `LIMIT ${limit}`;
+	let limitString = `LIMIT $${categoryValues.length + 1}`;
 	let offset =  body.offset || 0;
-	let offsetString = `OFFSET ${offset}`
+	let offsetString = `OFFSET $${categoryValues.length + 2}`
+	const values = categoryValues.concat([limit, offset]);
 
 	const query = `
 		SELECT 
@@ -33,8 +34,7 @@ router.post("/get", async (req, res) => {
 		;
 	`;
 
-
-  pool.query(query, (error, results) => {
+  pool.query(query, values, (error, results) => {
     if (error) {
       console.error(error)
       res.status(404).json(error)
@@ -45,20 +45,23 @@ router.post("/get", async (req, res) => {
 
 router.post("/best_prices", (req, res) => {
 	const {pool, body} = req;
+
 	let whereString = "";
-	
+	const categoryValues = [] // [categories[0], ...items]
 	if (body.filter && body.filter.categories) {
-		console.log("get here", body.filter.categories)
 		whereString = body.filter.categories.reduce((collector, item, index) => {
+			categoryValues.push(body.filter.categories[index]);
 			if (index == 0 ) return collector;
-			return collector + ` OR '${item}' = ANY (markets.categories)`
-		},  `AND  '${body.filter.categories[0]}' = ANY(markets.categories)`)
+			return collector + ` OR $${index + 1} = ANY (markets.categories)`
+		},  `WHERE  $1 = ANY(markets.categories)`)
 	}
 
 	let limit = body.limit || 20;
-	let limitString = `LIMIT ${limit}`;
-	let offset = body.offset || 0;
-	let offsetString = `OFFSET ${offset}`
+	let limitString = `LIMIT $${categoryValues.length + 1}`;
+	let offset =  body.offset || 0;
+	let offsetString = `OFFSET $${categoryValues.length + 2}`
+	const values = categoryValues.concat([limit, offset]);
+
 
 	const query = `
 		SELECT 
@@ -72,7 +75,7 @@ router.post("/best_prices", (req, res) => {
 		GROUP BY orders.market_id, orders.outcome;
 	`;
 	
-  pool.query(query, (error, results) => {
+  pool.query(query, values, (error, results) => {
     if (error) {
       console.error(error)
       res.status(404).json(error)
@@ -96,23 +99,22 @@ router.post("/best_prices", (req, res) => {
 
 router.post("/last_filled_prices", (req, res) => {
 	const {pool, body} = req;
+
 	let whereString = "";
-	
+	const categoryValues = [] // [categories[0], ...items]
 	if (body.filter && body.filter.categories) {
-
 		whereString = body.filter.categories.reduce((collector, item, index) => {
+			categoryValues.push(body.filter.categories[index]);
 			if (index == 0 ) return collector;
-			return collector + ` OR '${item}' = ANY (markets.categories)`
-		},  `WHERE  '${body.filter.categories[0]}' = ANY(markets.categories)`)
+			return collector + ` OR $${index + 1} = ANY (markets.categories)`
+		},  `WHERE  $1 = ANY(markets.categories)`)
 	}
+	let limit = body.limit || 20;
+	let limitString = `LIMIT $${categoryValues.length + 1}`;
+	let offset =  body.offset || 0;
+	let offsetString = `OFFSET $${categoryValues.length + 2}`
+	const values = categoryValues.concat([limit, offset]);
 
-	console.log(body)
-	let limit =  body.limit || 20;
-	let limitString = `LIMIT ${limit}`;
-	let offset = body.offset || 0;
-	let offsetString = `OFFSET ${offset}`
-
-	console.log(limitString, offsetString)
 	const query = `
 		SELECT 
 			f1.outcome, 
@@ -139,7 +141,7 @@ router.post("/last_filled_prices", (req, res) => {
 		;
 	`;
 	
-  pool.query(query, (error, results) => {
+  pool.query(query, values, (error, results) => {
     if (error) {
       console.error(error)
       res.status(404).json(error)
