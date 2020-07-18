@@ -7,6 +7,7 @@ const compression = require("compression");
 const helmet = require("helmet");
 const markets = require("./api/markets");
 const market = require("./api/market");
+const history = require("./api/historicData");
 
 const app = express()
 app.use(compression())
@@ -40,6 +41,11 @@ app.use("/market", (req, res, next) => {
   req.pool = pool;
   next();
 }, market);
+
+app.use("/history", (req, res, next) => {
+  req.pool = pool;
+  next();
+}, history);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server listening`)
