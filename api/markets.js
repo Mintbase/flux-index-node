@@ -28,7 +28,7 @@ router.post("/get", async (req, res) => {
 		FROM markets
 		LEFT JOIN orders
 		ON markets.id = orders.market_id 
-		WHERE markets.end_date_time > ${new Date().getTime()} ${whereString && whereString}
+		WHERE markets.end_date_time > to_timestamp(${new Date().getTime()} / 1000) ${whereString && whereString}
 		GROUP BY markets.id
 		ORDER BY volume
 		${limitString} ${offsetString}
@@ -72,7 +72,7 @@ router.post("/best_prices", (req, res) => {
 		FROM orders
 		JOIN (SELECT * from markets ${limitString} ${offsetString}) markets
 		ON orders.market_id = markets.id
-		WHERE orders.closed = false ${whereString && whereString} AND markets.end_date_time > ${new Date().getTime()}
+		WHERE orders.closed = false ${whereString && whereString} AND markets.end_date_time > to_timestamp(${new Date().getTime()} / 1000)
 		GROUP BY orders.market_id, orders.outcome;
 	`;
 	
@@ -130,11 +130,11 @@ router.post("/last_filled_prices", (req, res) => {
 			FROM fills
 			JOIN (
 				SELECT * FROM markets
-				WHERE markets.end_date_time > ${new Date().getTime()} ${whereString && whereString}
+				WHERE markets.end_date_time > to_timestamp(${new Date().getTime()} / 1000) ${whereString && whereString}
 				${limitString} ${offsetString}
 			) markets
 			ON fills.market_id = markets.id
-			WHERE fills.fill_time < ${new Date().getTime()}
+			WHERE fills.fill_time < to_timestamp(${new Date().getTime()} / 1000)
 			GROUP BY fills.market_id, fills.outcome
 		) f2 ON f1.market_id = f2.market_id
 			AND f1.outcome = f2.outcome
@@ -149,12 +149,12 @@ router.post("/last_filled_prices", (req, res) => {
 		}
 
 		const rows = results.rows;
-		const marketPricePerOutcome = {}
+		const lastFillPricePerOutcome = {}
 		rows.forEach(lastFill => {
-			if (!marketPricePerOutcome[lastFill.market_id]) marketPricePerOutcome[lastFill.market_id] = {};
-			marketPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
+			if (!lastFillPricePerOutcome[lastFill.market_id]) lastFillPricePerOutcome[lastFill.market_id] = {};
+			lastFillPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
 		});
-    res.status(200).json(marketPricePerOutcome)
+    res.status(200).json(lastFillPricePerOutcome)
 	})
 });
 

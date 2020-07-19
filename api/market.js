@@ -33,19 +33,17 @@ router.post("/get", (req, res) => {
 
 
 // TODO: should be last filled prices
-router.post("/best_prices", (req, res) => {
+router.post("/market_prices", (req, res) => {
 	const {pool, body} = req;
 
 	const query = `
 		SELECT 
-			orders.market_id,
-			orders.outcome,
-			MAX(orders.price) best_price
+			outcome,
+			MAX(price) best_price
 		FROM orders
-		LEFT JOIN markets
-		ON orders.market_id = markets.id
-		WHERE orders.closed = false AND markets.id = $1
-		GROUP BY orders.market_id, orders.outcome
+		WHERE closed = false AND market_id = $1
+		GROUP BY outcome
+		ORDER BY outcome
 	`;
 
 	const values = [body.marketId];
@@ -56,18 +54,18 @@ router.post("/best_prices", (req, res) => {
       res.status(404).json(error)
 		}
 
-		const bestPricePerOutcome = {
-			total: 0
-		}
+		const marketPricePerOutcome = {}
 
 		const rows = results.rows;
 
-		rows.forEach(outcomes => {
-			if (!bestPricePerOutcome[outcomes.market_id]) bestPricePerOutcome[outcomes.market_id] = {};
-			bestPricePerOutcome[outcomes.market_id][outcomes.outcome] = outcomes.best_price;
-			bestPricePerOutcome.total += parseInt(outcomes.best_price);
-		});
-    res.status(200).json(bestPricePerOutcome)
+		for (let i = 0; i < rows.length; i++) {
+			for (let x = 0; x < rows.length; x++) {
+				if (x === i) continue;
+				if(!marketPricePerOutcome[x]) marketPricePerOutcome[x] = 100;
+				marketPricePerOutcome[x] -= rows[i].best_price;
+			}
+		}
+    res.status(200).json(marketPricePerOutcome)
 	})
 });
 
@@ -91,7 +89,7 @@ router.post("/last_filled_prices", (req, res) => {
 				WHERE markets.id = $1
 			) markets
 			ON fills.market_id = markets.id
-			WHERE fills.fill_time < ${new Date().getTime()}
+			WHERE fills.fill_time < to_timestamp(${new Date().getTime()} / 1000)
 			GROUP BY fills.market_id, fills.outcome
 		) f2 ON f1.market_id = f2.market_id
 			AND f1.outcome = f2.outcome
@@ -108,12 +106,12 @@ router.post("/last_filled_prices", (req, res) => {
 		}
 
 		const rows = results.rows;
-		const marketPricePerOutcome = {}
+		const lastFillPricePerOutcome = {}
 		rows.forEach(lastFill => {
-			if (!marketPricePerOutcome[lastFill.market_id]) marketPricePerOutcome[lastFill.market_id] = {};
-			marketPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
+			if (!lastFillPricePerOutcome[lastFill.market_id]) lastFillPricePerOutcome[lastFill.market_id] = {};
+			lastFillPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
 		});
-    res.status(200).json(marketPricePerOutcome)
+    res.status(200).json(lastFillPricePerOutcome)
 	})
 });
 
@@ -194,10 +192,5 @@ router.post("/get_avg_prices_for_date", (req, res) => {
     res.status(200).json(results.rows);
 	})
 }); 
-
-
-
-
-
 
 module.exports = router;
