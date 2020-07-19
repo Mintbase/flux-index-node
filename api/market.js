@@ -8,7 +8,9 @@ router.post("/get", (req, res) => {
 	const query = `
 		SELECT 
 			SUM(orders.filled) as filled,
-			markets.*
+			markets.*,
+			extract(epoch from markets.creation_date) as creation_timestamp,
+			extract(epoch from markets.end_date_time) as end_timestamp
 		FROM markets
 		LEFT JOIN orders
 		ON markets.id = orders.market_id
@@ -89,7 +91,7 @@ router.post("/last_filled_prices", (req, res) => {
 				WHERE markets.id = $1
 			) markets
 			ON fills.market_id = markets.id
-			WHERE fills.fill_time < NOW()
+			WHERE fills.fill_time < ${new Date().getTime()}
 			GROUP BY fills.market_id, fills.outcome
 		) f2 ON f1.market_id = f2.market_id
 			AND f1.outcome = f2.outcome

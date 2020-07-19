@@ -1,5 +1,4 @@
 const express = require("express");
-const moment = require("moment");
 
 const router = express.Router();
 router.post("/get", async (req, res) => {
@@ -12,7 +11,7 @@ router.post("/get", async (req, res) => {
 			categoryValues.push(body.filter.categories[index]);
 			if (index == 0 ) return collector;
 			return collector + ` OR $${index + 1} = ANY (markets.categories)`
-		},  `WHERE  $1 = ANY(markets.categories)`)
+		},  `AND $1 = ANY(markets.categories)`)
 	}
 	let limit = body.limit || 20;
 	let limitString = `LIMIT $${categoryValues.length + 1}`;
@@ -23,11 +22,13 @@ router.post("/get", async (req, res) => {
 	const query = `
 		SELECT 
 			SUM(orders.filled) as volume,
-			markets.*
+			markets.*,
+			extract(epoch from markets.creation_date) as creation_timestamp,
+			extract(epoch from markets.end_date_time) as end_timestamp
 		FROM markets
 		LEFT JOIN orders
-		ON markets.id = orders.market_id
-		${whereString && whereString}
+		ON markets.id = orders.market_id 
+		WHERE markets.end_date_time > ${new Date().getTime()} ${whereString && whereString}
 		GROUP BY markets.id
 		ORDER BY volume
 		${limitString} ${offsetString}
@@ -71,7 +72,7 @@ router.post("/best_prices", (req, res) => {
 		FROM orders
 		JOIN (SELECT * from markets ${limitString} ${offsetString}) markets
 		ON orders.market_id = markets.id
-		WHERE orders.closed = false ${whereString && whereString}
+		WHERE orders.closed = false ${whereString && whereString} AND markets.end_date_time > ${new Date().getTime()}
 		GROUP BY orders.market_id, orders.outcome;
 	`;
 	
@@ -107,7 +108,7 @@ router.post("/last_filled_prices", (req, res) => {
 			categoryValues.push(body.filter.categories[index]);
 			if (index == 0 ) return collector;
 			return collector + ` OR $${index + 1} = ANY (markets.categories)`
-		},  `WHERE  $1 = ANY(markets.categories)`)
+		},  `AND  $1 = ANY(markets.categories)`)
 	}
 	let limit = body.limit || 20;
 	let limitString = `LIMIT $${categoryValues.length + 1}`;
@@ -129,11 +130,11 @@ router.post("/last_filled_prices", (req, res) => {
 			FROM fills
 			JOIN (
 				SELECT * FROM markets
-				${whereString && whereString}
+				WHERE markets.end_date_time > ${new Date().getTime()} ${whereString && whereString}
 				${limitString} ${offsetString}
 			) markets
 			ON fills.market_id = markets.id
-			WHERE fills.fill_time < NOW()
+			WHERE fills.fill_time < ${new Date().getTime()}
 			GROUP BY fills.market_id, fills.outcome
 		) f2 ON f1.market_id = f2.market_id
 			AND f1.outcome = f2.outcome
