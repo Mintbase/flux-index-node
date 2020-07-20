@@ -32,7 +32,7 @@ router.post("/get", (req, res) => {
 });
 
 
-// TODO: should be last filled prices
+// TODO: should take into account that maybe there are no orders for one outcoome - the loop doesn't take this into account during calculation so outcome might be missmapped
 router.post("/market_prices", (req, res) => {
 	const {pool, body} = req;
 
@@ -60,9 +60,10 @@ router.post("/market_prices", (req, res) => {
 
 		for (let i = 0; i < rows.length; i++) {
 			for (let x = 0; x < rows.length; x++) {
+				let outcomeX = rows[x].outcome;
 				if (x === i) continue;
-				if(!marketPricePerOutcome[x]) marketPricePerOutcome[x] = 100;
-				marketPricePerOutcome[x] -= rows[i].best_price;
+				if(!marketPricePerOutcome[outcomeX]) marketPricePerOutcome[outcomeX] = 100;
+				marketPricePerOutcome[outcomeX] -= rows[i].best_price;
 			}
 		}
     res.status(200).json(marketPricePerOutcome)
@@ -108,8 +109,7 @@ router.post("/last_filled_prices", (req, res) => {
 		const rows = results.rows;
 		const lastFillPricePerOutcome = {}
 		rows.forEach(lastFill => {
-			if (!lastFillPricePerOutcome[lastFill.market_id]) lastFillPricePerOutcome[lastFill.market_id] = {};
-			lastFillPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
+			lastFillPricePerOutcome[lastFill.outcome] = lastFill.price;
 		});
     res.status(200).json(lastFillPricePerOutcome)
 	})
