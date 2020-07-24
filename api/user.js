@@ -65,6 +65,29 @@ router.post("/get_order_history", (req, res) => {
 
     res.status(200).json(results.rows);
 	})
-}); 
+});
+
+router.post("/get_finalized_participated_markets", (req, res) => {
+	const {pool, body} = req;
+
+	const query = `
+		SELECT orders.market_id, orders.creator, markets.description FROM orders
+		RIGHT JOIN markets
+		ON orders.market_id = markets.id
+		WHERE orders.creator = $1 AND markets.finalized = true
+		GROUP BY orders.market_id, orders.creator, markets.description;
+	`;
+	const values = [body.accountId]
+
+	pool.query(query, values, (error, results) => {
+    if (error) {
+      console.error(error)
+      res.status(404).json(error)
+		}
+
+    res.status(200).json(results.rows);
+	})
+});
+
 
 module.exports = router;
