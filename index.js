@@ -10,6 +10,7 @@ const market = require("./api/market");
 const history = require("./api/historicData");
 const orderbook = require("./api/orderbook");
 const user = require("./api/user");
+const earnings = require("./api/earnings");
 
 const app = express()
 app.use(compression())
@@ -58,6 +59,11 @@ app.use("/user", (req, res, next) => {
   req.pool = pool;
   next();
 }, user);
+
+app.use("/earnings", (req, res, next) => {
+  req.pool = pool;
+  next();
+}, earnings);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server listening`)
