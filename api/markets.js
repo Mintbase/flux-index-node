@@ -158,50 +158,39 @@ router.post("/last_filled_prices", (req, res) => {
 	})
 });
 
+router.post("/get_resoluting", async (req, res) => {
+	const {pool, body} = req;
+	console.log("getting resoluting markets")
 
+	let limit = body.limit || 20;
+	let limitString = `LIMIT $1`;
+	let offset =  body.offset || 0;
+	let offsetString = `OFFSET $2`
+	const values = [limit, offset];
 
-// // TODO: should be last filled prices
-// router.get("/set_fill_script", (req, res) => {
-// 	const {pool} = req;
+	const query = `
+		SELECT 
+			SUM(orders.filled) as volume,
+			markets.*,
+			extract(epoch from markets.creation_date) as creation_timestamp,
+			extract(epoch from markets.end_date_time) as end_timestamp
+		FROM markets
+		LEFT JOIN orders
+		ON markets.id = orders.market_id 
+		WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000) AND markets.finalized = false
+		GROUP BY markets.id
+		ORDER BY volume
+		${limitString} ${offsetString}
+		;
+	`;
 
-// 	const query = `
-// 		SELECT 
-// 			id, 
-// 			creator, 
-// 			outcome, 
-// 			market_id, 
-// 			filled, 
-// 			price
-// 		FROM public.orders 
-// 		WHERE filled > 0;
-// 	`;
-	
-//   pool.query(query, async (error, results) => {
-//     if (error) {
-//       console.error(error)
-//       return res.status(404).json(error)
-// 		}
-
-// 		results.rows.forEach(row => {
-// 			for (var x = 0; x <= 61; x++) {
-// 				const date = moment().subtract(30, "days").add(x, "days");
-// 				for (var i = 0; i <=23; i++) {
-// 					const addFillDateTime = date.hours(i).minutes(0).unix();
-// 					const randomPrice = Math.floor(Math.random() * (99 - 1) + 1);
-// 					const addFillQuery = `INSERT INTO public.fills 
-// 					(order_id, outcome, market_id, amount, price, fill_time, owner) 
-// 					VALUES 
-// 					(${row.id}, ${row.outcome}, ${row.market_id}, ${row.filled}, ${randomPrice}, TO_TIMESTAMP(${addFillDateTime}), '${row.creator}')`
-// 					pool.query(addFillQuery, (error, results) => {
-// 						if (error) console.log("ERROR", error);
-// 					});
-// 				}
-// 			}
-// 		})
-		
-// 		return res.status(200).json({"success": true});
-// 	})
-// });
-
+  pool.query(query, values, (error, results) => {
+    if (error) {
+      console.error(error)
+      res.status(404).json(error)
+		}
+    res.status(200).json(results.rows)
+	})
+});
 
 module.exports = router;
