@@ -191,6 +191,7 @@ router.post("/get_avg_prices_for_date", (req, res) => {
 
     res.status(200).json(results.rows);
 	})
-}); 
+});
+
 
 module.exports = router;
