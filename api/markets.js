@@ -158,6 +158,7 @@ router.post("/last_filled_prices", (req, res) => {
 	})
 });
 
+// TODO left join the last resolution window as 
 router.post("/get_resoluting", async (req, res) => {
 	const {pool, body} = req;
 	console.log("getting resoluting markets")
@@ -173,10 +174,12 @@ router.post("/get_resoluting", async (req, res) => {
 			SUM(orders.filled) as volume,
 			markets.*,
 			extract(epoch from markets.creation_date) as creation_timestamp,
-			extract(epoch from markets.end_date_time) as end_timestamp
+			extract(epoch from markets.end_date_time) as end_timestamp,
 		FROM markets
-		LEFT JOIN orders
-		ON markets.id = orders.market_id 
+		JOIN (
+			SELECT * from resolution_windwo
+		)
+		LEFT JOIN orders ON markets.id = orders.market_id 
 		WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000) AND markets.finalized = false
 		GROUP BY markets.id
 		ORDER BY volume
