@@ -158,7 +158,6 @@ router.post("/last_filled_prices", (req, res) => {
 	})
 });
 
-// TODO left join the last resolution window as 
 router.post("/get_resoluting", async (req, res) => {
 	const {pool, body} = req;
 	console.log("getting resoluting markets")
@@ -170,22 +169,31 @@ router.post("/get_resoluting", async (req, res) => {
 	const values = [limit, offset];
 
 	const query = `
+	SELECT 
+		SUM(orders.filled) as volume,
+		markets.*,
+		extract(epoch from markets.creation_date) as creation_timestamp,
+		extract(epoch from markets.end_date_time) as end_timestamp,
+		res_win.resolution_state,
+		res_win.resolution_round_end_time
+	FROM markets
+	JOIN (
 		SELECT 
-			SUM(orders.filled) as volume,
-			markets.*,
-			extract(epoch from markets.creation_date) as creation_timestamp,
-			extract(epoch from markets.end_date_time) as end_timestamp,
-		FROM markets
-		JOIN (
-			SELECT * from resolution_windwo
-		)
-		LEFT JOIN orders ON markets.id = orders.market_id 
-		WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000) AND markets.finalized = false
-		GROUP BY markets.id
-		ORDER BY volume
-		${limitString} ${offsetString}
-		;
-	`;
+			MAX(resolution_windows.round) AS resolution_state, 
+			resolution_windows.end_time AS resolution_round_end_time,
+			resolution_windows.market_id
+		FROM resolution_windows
+		GROUP BY resolution_windows.end_time, resolution_windows.market_id
+	) res_win
+	ON markets.id = res_win.market_id
+	LEFT JOIN orders 
+	ON markets.id = orders.market_id
+	WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000) AND markets.finalized = false
+	GROUP BY markets.id, res_win.resolution_state, res_win.resolution_round_end_time
+	ORDER BY volume
+	${limitString}
+	${offsetString};
+`;
 
   pool.query(query, values, (error, results) => {
     if (error) {
@@ -195,5 +203,45 @@ router.post("/get_resoluting", async (req, res) => {
     res.status(200).json(results.rows)
 	})
 });
+
+
+router.post("/get_resolution_state", async (req, res) => {
+	const {pool, body} = req;
+	console.log("getting resoluting markets")
+
+	let limit = body.limit || 20;
+	let limitString = `LIMIT $1`;
+	let offset =  body.offset || 0;
+	let offsetString = `OFFSET $2`
+	const values = [limit, offset];
+
+	const query = `
+	SELECT 
+		markets.id as market_id,
+		SUM(orders.filled) as volume,
+		total_stake_in_outcomes.outcome,
+		MAX(total_stake_in_outcomes.round) max_round
+	FROM markets
+	LEFT JOIN orders
+	ON markets.id = orders.market_id
+	RIGHT JOIN total_stake_in_outcomes
+	ON markets.id = total_stake_in_outcomes.market_id
+	WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000)
+	GROUP BY markets.id, total_stake_in_outcomes.outcome
+	ORDER BY volume
+	${limitString}
+	${offsetString};
+`;
+
+  pool.query(query, values, (error, results) => {
+    if (error) {
+      console.error(error)
+      res.status(404).json(error)
+		}
+    res.status(200).json(results.rows)
+	})
+});
+
+
 
 module.exports = router;

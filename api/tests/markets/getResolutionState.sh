@@ -1,0 +1,1 @@
+curl -X POST -H "Content-Type: application/json" localhost:3000/markets/get_resolution_state
