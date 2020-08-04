@@ -1,17 +1,21 @@
 const express = require("express");
 const router = express.Router();
 
-router.post("/get_trading", (req, res) => {
+router.post("/get_trading_earnings", (req, res) => {
 	const {pool, body} = req;
+	const marketId = body.marketId;
+	const accountId = body.accountId;
 
 	const query = `
-		SELECT SUM(shares_filled) * 100 as claimable FROM orders 
-		LEFT JOIN markets
-		ON orders.market_id = markets.id
-		WHERE markets.finalized = true AND orders.creator = $1 AND markets.winning_outcome = orders.outcome AND markets.id = $2;
+		SELECT 
+			fills.outcome, 
+			SUM(fills.amount / price * 100) 
+		FROM fills 
+		WHERE fills.owner = $1 AND fills.market_id = $2 
+		GROUP BY fills.outcome;
 	`;
 	
-	const values = [body.accountId, body.marketId]
+	const values = [accountId, marketId]
 
 	pool.query(query, values, (error, results) => {
     if (error) {
@@ -22,4 +26,5 @@ router.post("/get_trading", (req, res) => {
     res.status(200).json(results.rows);
 	})
 });
+
 module.exports = router;

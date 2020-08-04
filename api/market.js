@@ -32,13 +32,13 @@ router.post("/get", (req, res) => {
 });
 
 
-// TODO: should take into account that maybe there are no orders for one outcoome - the loop doesn't take this into account during calculation so outcome might be missmapped
 router.post("/market_prices", (req, res) => {
 	const {pool, body} = req;
 
 	const query = `
 		SELECT 
 			outcome,
+			SUM(shares - shares_filled) as amount,
 			MAX(price) best_price
 		FROM orders
 		WHERE closed = false AND market_id = $1
@@ -46,6 +46,7 @@ router.post("/market_prices", (req, res) => {
 		ORDER BY outcome
 	`;
 
+	console.log(query)
 	const values = [body.marketId];
 	
   pool.query(query, values, (error, results) => {
