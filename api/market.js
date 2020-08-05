@@ -46,19 +46,18 @@ router.post("/market_prices", (req, res) => {
 		ORDER BY outcome
 	`;
 
-	console.log(query)
 	const values = [body.marketId];
 	
   pool.query(query, values, (error, results) => {
     if (error) {
-      console.error(error)
+      console.error(error) 
       res.status(404).json(error)
 		}
 
 		const marketPricePerOutcome = {}
 
 		const rows = results.rows;
-
+		console.log(rows);
 		for (let i = 0; i < rows.length; i++) {
 			for (let x = 0; x < rows.length; x++) {
 				let outcomeX = rows[x].outcome;
