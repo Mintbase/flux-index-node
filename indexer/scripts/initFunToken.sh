@@ -1,1 +1,1 @@
-env NEAR_ENV=local near --keyPath ~/.near/localnet/validator_key.json call fun_token.test.near new "{\"owner_id\": \"flux-dev.test.near\", \"total_supply\": 10000000000}"
+env NEAR_ENV=local near --keyPath ~/.near/localnet/validator_key.json call $1.test.near new '{"owner_id": "flux-dev.test.near", "total_supply": "100000000000000000000"}' --accountId test.near
