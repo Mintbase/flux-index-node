@@ -10,6 +10,24 @@ mod configs;
 
 async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) {
     while let Some(block) = stream.recv().await {
+        println!("");
+        println!("");
+        
+        for chunk in &block.chunks {
+            println!("");
+            println!("receipts: {:?}", chunk.receipts);
+            println!("");
+        }
+        
+        for outcome in &block.outcomes {
+            println!("");
+            println!("outcomes: {:?}", outcome);
+            // This would be pseudocode for seemingly all methods
+            // if outcome.executor_id == flux_protocol 
+                // if status == SuccessValue
+                    // loop through and handle logs
+            println!("");
+        }
         // TODO: handle data as you need
         // Example of `block` with all the data
         //

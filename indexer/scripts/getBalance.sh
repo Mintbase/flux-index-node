@@ -1,1 +1,1 @@
-env NEAR_ENV=local near view $1.test.near get_balance '{"owner_id": "flux-dev.test.near"}'
+env NEAR_ENV=local near view $1.test.near get_balance '{"owner_id": "test.near"}'
