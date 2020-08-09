@@ -23,6 +23,13 @@ use near_indexer;
 async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) {
     while let Some(block) = stream.recv().await {
         for chunk in block.chunks {
+            // 1. receipt loop —> check if us (receiver id)
+            // 2. Outcome loop —> check if us (check if successful & receipt in receiptMap)
+            // 3. Process block —> pass in the outcome object (or just the logs underneath the outcome object)
+
+
+
+
             // 1) Add receipts into hashMap
             for receipt in chunk.receipts {
                 if filter::isSuccessfulReceipt(receipt) {
