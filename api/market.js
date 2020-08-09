@@ -46,28 +46,30 @@ router.post("/market_prices", (req, res) => {
 		ORDER BY outcome
 	`;
 
-	console.log(query)
 	const values = [body.marketId];
 	
   pool.query(query, values, (error, results) => {
     if (error) {
-      console.error(error)
+      console.error(error) 
       res.status(404).json(error)
 		}
 
-		const marketPricePerOutcome = {}
+		const marketPriceDepthPerOutcome = {}
 
 		const rows = results.rows;
-
+		
 		for (let i = 0; i < rows.length; i++) {
 			for (let x = 0; x < rows.length; x++) {
 				let outcomeX = rows[x].outcome;
 				if (x === i) continue;
-				if(!marketPricePerOutcome[outcomeX]) marketPricePerOutcome[outcomeX] = 100;
-				marketPricePerOutcome[outcomeX] -= rows[i].best_price;
+				if(!marketPriceDepthPerOutcome[outcomeX]) marketPriceDepthPerOutcome[outcomeX] = {marketPrice: 100, depth: rows[i].amount};
+				else if (marketPriceDepthPerOutcome[outcomeX].depth > rows[i].amount) {
+					marketPriceDepthPerOutcome[outcomeX].depth = rows[i].amount;
+				}
+				marketPriceDepthPerOutcome[outcomeX].marketPrice -= rows[i].best_price;
 			}
 		}
-    res.status(200).json(marketPricePerOutcome)
+    res.status(200).json(marketPriceDepthPerOutcome)
 	})
 });
 

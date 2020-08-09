@@ -1,0 +1,1 @@
+env NEAR_ENV=local near --keyPath ~/.near/localnet/validator_key.json call $1.test.near set_allowance '{"escrow_account_id": "'$2'.test.near", "allowance": "100000000000000000000000000000000"}' --accountId test.near
