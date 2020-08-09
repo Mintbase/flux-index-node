@@ -4,7 +4,7 @@ use std::io;
 use actix;
 use clap::derive::Clap;
 use tokio::sync::mpsc;
-use near_sdk::{collections::{UnorderedMap,}}
+use near_sdk::{collections::{UnorderedMap}};
 use near_primitives::{
     receipt::Receipt,
     transaction::{ExecutionOutcome, ExecutionStatus, SignedTransaction}
@@ -14,7 +14,7 @@ use configs::{init_logging, Opts, SubCommand};
 mod filter;
 mod configs;
 
-let mut receiptMap: UnorderedMap<String, Receipt> = UnorderedMap::new(b"receipts".to_vec());
+const receiptMap: UnorderedMap<String, receipt: Receipt> = UnorderedMap::new(b"receipts".to_vec());
 
 use near_indexer;
 
