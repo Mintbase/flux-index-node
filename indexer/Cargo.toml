@@ -11,5 +11,7 @@ openssl-probe = { version = "0.1.2" }
 serde_json = "1.0.55"
 tokio = { version = "0.2", features = ["sync"] }
 tracing-subscriber = "0.2.4"
+postgres = "0.17.5"
 
+near-primitives = { git = "https://github.com/nearprotocol/nearcore.git" }
 near-indexer = { git = "https://github.com/nearprotocol/nearcore.git" }

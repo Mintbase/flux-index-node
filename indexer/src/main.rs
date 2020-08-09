@@ -3,21 +3,18 @@ use actix;
 use clap::derive::Clap;
 use tokio::sync::mpsc;
 
-use configs::{init_logging, Opts, SubCommand};
+use configs::{Opts, SubCommand};
 use near_indexer;
 
 mod configs;
+mod db_utils;
 
 async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) {
+    // db_utils::connect();
+
     while let Some(block) = stream.recv().await {
         println!("");
         println!("");
-        
-        for chunk in &block.chunks {
-            println!("");
-            println!("receipts: {:?}", chunk.receipts);
-            println!("");
-        }
         
         for outcome in &block.outcomes {
             println!("");
