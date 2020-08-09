@@ -5,7 +5,7 @@
 -- Dumped from database version 12.3 (Debian 12.3-1.pgdg100+1)
 -- Dumped by pg_dump version 12.2
 
--- Started on 2020-08-10 00:14:44 CEST
+-- Started on 2020-07-20 15:28:23 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -23,7 +23,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- TOC entry 202 (class 1259 OID 16385)
+-- TOC entry 202 (class 1259 OID 24577)
 -- Name: account_stake_in_outcome; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -39,7 +39,7 @@ CREATE TABLE public.account_stake_in_outcome (
 ALTER TABLE public.account_stake_in_outcome OWNER TO flux;
 
 --
--- TOC entry 203 (class 1259 OID 16391)
+-- TOC entry 203 (class 1259 OID 24583)
 -- Name: accounts; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -52,7 +52,7 @@ CREATE TABLE public.accounts (
 ALTER TABLE public.accounts OWNER TO flux;
 
 --
--- TOC entry 204 (class 1259 OID 16397)
+-- TOC entry 204 (class 1259 OID 24589)
 -- Name: claimable_if_valid; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -66,7 +66,7 @@ CREATE TABLE public.claimable_if_valid (
 ALTER TABLE public.claimable_if_valid OWNER TO flux;
 
 --
--- TOC entry 205 (class 1259 OID 16403)
+-- TOC entry 205 (class 1259 OID 24595)
 -- Name: fills; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -85,7 +85,7 @@ CREATE TABLE public.fills (
 ALTER TABLE public.fills OWNER TO flux;
 
 --
--- TOC entry 206 (class 1259 OID 16409)
+-- TOC entry 206 (class 1259 OID 24601)
 -- Name: fills_id_seq; Type: SEQUENCE; Schema: public; Owner: flux
 --
 
@@ -109,7 +109,7 @@ ALTER SEQUENCE public.fills_id_seq OWNED BY public.fills.id;
 
 
 --
--- TOC entry 207 (class 1259 OID 16411)
+-- TOC entry 207 (class 1259 OID 24603)
 -- Name: markets; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -140,7 +140,7 @@ CREATE TABLE public.markets (
 ALTER TABLE public.markets OWNER TO flux;
 
 --
--- TOC entry 208 (class 1259 OID 16417)
+-- TOC entry 208 (class 1259 OID 24609)
 -- Name: orderbooks; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -153,7 +153,7 @@ CREATE TABLE public.orderbooks (
 ALTER TABLE public.orderbooks OWNER TO flux;
 
 --
--- TOC entry 209 (class 1259 OID 16420)
+-- TOC entry 209 (class 1259 OID 24612)
 -- Name: orders; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -176,7 +176,7 @@ CREATE TABLE public.orders (
 ALTER TABLE public.orders OWNER TO flux;
 
 --
--- TOC entry 210 (class 1259 OID 16426)
+-- TOC entry 210 (class 1259 OID 24618)
 -- Name: protocol; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -190,7 +190,7 @@ CREATE TABLE public.protocol (
 ALTER TABLE public.protocol OWNER TO flux;
 
 --
--- TOC entry 211 (class 1259 OID 16432)
+-- TOC entry 211 (class 1259 OID 24624)
 -- Name: resolution_windows; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -206,7 +206,7 @@ CREATE TABLE public.resolution_windows (
 ALTER TABLE public.resolution_windows OWNER TO flux;
 
 --
--- TOC entry 212 (class 1259 OID 16438)
+-- TOC entry 212 (class 1259 OID 24630)
 -- Name: total_stake_in_outcomes; Type: TABLE; Schema: public; Owner: flux
 --
 
@@ -221,7 +221,7 @@ CREATE TABLE public.total_stake_in_outcomes (
 ALTER TABLE public.total_stake_in_outcomes OWNER TO flux;
 
 --
--- TOC entry 2822 (class 2604 OID 16444)
+-- TOC entry 2822 (class 2604 OID 24636)
 -- Name: fills id; Type: DEFAULT; Schema: public; Owner: flux
 --
 
@@ -229,7 +229,7 @@ ALTER TABLE ONLY public.fills ALTER COLUMN id SET DEFAULT nextval('public.fills_
 
 
 --
--- TOC entry 2982 (class 0 OID 16385)
+-- TOC entry 2982 (class 0 OID 24577)
 -- Dependencies: 202
 -- Data for Name: account_stake_in_outcome; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -243,7 +243,7 @@ test-dev	5	0	10000000000000000000	1
 
 
 --
--- TOC entry 2983 (class 0 OID 16391)
+-- TOC entry 2983 (class 0 OID 24583)
 -- Dependencies: 203
 -- Data for Name: accounts; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -255,7 +255,7 @@ test-dev	0
 
 
 --
--- TOC entry 2984 (class 0 OID 16397)
+-- TOC entry 2984 (class 0 OID 24589)
 -- Dependencies: 204
 -- Data for Name: claimable_if_valid; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -271,7 +271,7 @@ test-dev	2	0
 
 
 --
--- TOC entry 2985 (class 0 OID 16403)
+-- TOC entry 2985 (class 0 OID 24595)
 -- Dependencies: 205
 -- Data for Name: fills; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -19625,7 +19625,7 @@ COPY public.fills (order_id, market_id, outcome, amount, fill_time, owner, price
 
 
 --
--- TOC entry 2987 (class 0 OID 16411)
+-- TOC entry 2987 (class 0 OID 24603)
 -- Dependencies: 207
 -- Data for Name: markets; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -19637,14 +19637,11 @@ COPY public.markets (id, description, extra_info, creator, creation_date, end_da
 3	This is a resoluted / finished and disputable market		flux-dev	2020-07-16 00:00:00+00	2020-07-16 06:22:13.383759+00	2	{"",""}	{viral}	\N	f	5000000000000000000	0	f	f	100	100	10	\N	f
 4	This is a market that can be finalized		flux-dev	2020-07-16 00:00:00+00	2020-07-16 06:22:43.072149+00	2	{"",""}	{viral}	\N	f	5000000000000000000	0	f	f	100	100	10	\N	f
 5	This is a disputed market that needs the judge to resolute		flux-dev	2020-07-16 00:00:00+00	2020-07-16 06:53:16.808357+00	2	{"",""}	{viral}	\N	f	5000000000000000000	0	f	f	100	100	10	\N	f
-6	finalized market	\N	flux-dev	2020-08-04 14:07:01.124125+00	2020-01-01 00:00:00+00	2	{boop,biep}	{test}	1	t	5000000000000000000	0	t	t	1	1	50	\N	f
-7	test	Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla	flux-dev	2020-08-09 22:08:24.027192+00	2021-01-01 00:00:00+00	2	{boop,biep}	{test}	\N	f	5000000000000000000	0	f	f	1	1	50	\N	f
-8	test	Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla	flux-dev	2020-08-09 22:09:00.697126+00	2021-01-01 00:00:00+00	2	{boop,biep}	{test}	\N	f	5000000000000000000	0	f	f	1	1	50	\N	f
 \.
 
 
 --
--- TOC entry 2988 (class 0 OID 16417)
+-- TOC entry 2988 (class 0 OID 24609)
 -- Dependencies: 208
 -- Data for Name: orderbooks; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -19670,7 +19667,7 @@ COPY public.orderbooks (market_id, outcome) FROM stdin;
 
 
 --
--- TOC entry 2989 (class 0 OID 16420)
+-- TOC entry 2989 (class 0 OID 24612)
 -- Dependencies: 209
 -- Data for Name: orders; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -19701,7 +19698,7 @@ COPY public.orders (id, creator, outcome, market_id, spend, shares, price, fille
 
 
 --
--- TOC entry 2990 (class 0 OID 16426)
+-- TOC entry 2990 (class 0 OID 24618)
 -- Dependencies: 210
 -- Data for Name: protocol; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -19712,7 +19709,7 @@ flux-dev	250000000000000000	5000000000000000000
 
 
 --
--- TOC entry 2991 (class 0 OID 16432)
+-- TOC entry 2991 (class 0 OID 24624)
 -- Dependencies: 211
 -- Data for Name: resolution_windows; Type: TABLE DATA; Schema: public; Owner: flux
 --
@@ -19724,22 +19721,20 @@ COPY public.resolution_windows (market_id, round, bond_size, end_time, outcome) 
 4	1	10000000000000000000	2020-07-16 00:00:00+00	\N
 5	0	5000000000000000000	2020-07-16 00:00:00+00	1
 5	1	10000000000000000000	2020-07-16 00:00:00+00	0
-6	0	5000000000000000000	2020-08-04 14:10:02.081687+00	0
-6	1	10000000000000000000	2020-08-04 14:10:14.67017+00	1
 \.
 
 
 --
--- TOC entry 2992 (class 0 OID 16438)
+-- TOC entry 2992 (class 0 OID 24630)
 -- Dependencies: 212
 -- Data for Name: total_stake_in_outcomes; Type: TABLE DATA; Schema: public; Owner: flux
 --
 
 COPY public.total_stake_in_outcomes (market_id, outcome, round, stake) FROM stdin;
+3	0	0	5000000000000000000
+4	1	0	5000000000000000000
 5	1	0	5000000000000000000
 5	0	1	10000000000000000000
-3	0	0	3000000000000000000
-4	1	0	2000000000000000000
 \.
 
 
@@ -19753,7 +19748,7 @@ SELECT pg_catalog.setval('public.fills_id_seq', 38688, true);
 
 
 --
--- TOC entry 2824 (class 2606 OID 16446)
+-- TOC entry 2824 (class 2606 OID 24638)
 -- Name: account_stake_in_outcome account_stake_in_outcome_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19762,7 +19757,7 @@ ALTER TABLE ONLY public.account_stake_in_outcome
 
 
 --
--- TOC entry 2828 (class 2606 OID 16448)
+-- TOC entry 2828 (class 2606 OID 24640)
 -- Name: claimable_if_valid claimable_if_valid_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19771,7 +19766,7 @@ ALTER TABLE ONLY public.claimable_if_valid
 
 
 --
--- TOC entry 2830 (class 2606 OID 16450)
+-- TOC entry 2830 (class 2606 OID 24642)
 -- Name: fills fills_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19780,7 +19775,7 @@ ALTER TABLE ONLY public.fills
 
 
 --
--- TOC entry 2826 (class 2606 OID 16452)
+-- TOC entry 2826 (class 2606 OID 24644)
 -- Name: accounts markets_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19789,7 +19784,7 @@ ALTER TABLE ONLY public.accounts
 
 
 --
--- TOC entry 2832 (class 2606 OID 16454)
+-- TOC entry 2832 (class 2606 OID 24646)
 -- Name: markets markets_pkey1; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19798,7 +19793,7 @@ ALTER TABLE ONLY public.markets
 
 
 --
--- TOC entry 2834 (class 2606 OID 16456)
+-- TOC entry 2834 (class 2606 OID 24648)
 -- Name: orderbooks orderbooks_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19807,7 +19802,7 @@ ALTER TABLE ONLY public.orderbooks
 
 
 --
--- TOC entry 2836 (class 2606 OID 16458)
+-- TOC entry 2836 (class 2606 OID 24650)
 -- Name: orders orders_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19816,7 +19811,7 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- TOC entry 2838 (class 2606 OID 16460)
+-- TOC entry 2838 (class 2606 OID 24652)
 -- Name: protocol protocol_data_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19825,7 +19820,7 @@ ALTER TABLE ONLY public.protocol
 
 
 --
--- TOC entry 2840 (class 2606 OID 16462)
+-- TOC entry 2840 (class 2606 OID 24654)
 -- Name: resolution_windows resolution_windows_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19834,7 +19829,7 @@ ALTER TABLE ONLY public.resolution_windows
 
 
 --
--- TOC entry 2842 (class 2606 OID 16464)
+-- TOC entry 2842 (class 2606 OID 24656)
 -- Name: total_stake_in_outcomes total_stake_in_outcomes_pkey; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19843,7 +19838,7 @@ ALTER TABLE ONLY public.total_stake_in_outcomes
 
 
 --
--- TOC entry 2847 (class 2606 OID 16465)
+-- TOC entry 2847 (class 2606 OID 24657)
 -- Name: fills acccounts_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19852,7 +19847,7 @@ ALTER TABLE ONLY public.fills
 
 
 --
--- TOC entry 2850 (class 2606 OID 16470)
+-- TOC entry 2850 (class 2606 OID 24662)
 -- Name: markets accounts_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19861,7 +19856,7 @@ ALTER TABLE ONLY public.markets
 
 
 --
--- TOC entry 2845 (class 2606 OID 16475)
+-- TOC entry 2845 (class 2606 OID 24667)
 -- Name: claimable_if_valid accounts_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19870,7 +19865,7 @@ ALTER TABLE ONLY public.claimable_if_valid
 
 
 --
--- TOC entry 2843 (class 2606 OID 16480)
+-- TOC entry 2843 (class 2606 OID 24672)
 -- Name: account_stake_in_outcome accounts_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19879,7 +19874,7 @@ ALTER TABLE ONLY public.account_stake_in_outcome
 
 
 --
--- TOC entry 2852 (class 2606 OID 16485)
+-- TOC entry 2852 (class 2606 OID 24677)
 -- Name: orders accounts_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19888,7 +19883,7 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- TOC entry 2854 (class 2606 OID 16490)
+-- TOC entry 2854 (class 2606 OID 24682)
 -- Name: resolution_windows markets_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19897,7 +19892,7 @@ ALTER TABLE ONLY public.resolution_windows
 
 
 --
--- TOC entry 2851 (class 2606 OID 16495)
+-- TOC entry 2851 (class 2606 OID 24687)
 -- Name: orderbooks markets_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19906,7 +19901,7 @@ ALTER TABLE ONLY public.orderbooks
 
 
 --
--- TOC entry 2846 (class 2606 OID 16500)
+-- TOC entry 2846 (class 2606 OID 24692)
 -- Name: claimable_if_valid marketst_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19915,7 +19910,7 @@ ALTER TABLE ONLY public.claimable_if_valid
 
 
 --
--- TOC entry 2848 (class 2606 OID 16505)
+-- TOC entry 2848 (class 2606 OID 24697)
 -- Name: fills order_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19924,7 +19919,7 @@ ALTER TABLE ONLY public.fills
 
 
 --
--- TOC entry 2853 (class 2606 OID 16510)
+-- TOC entry 2853 (class 2606 OID 24702)
 -- Name: orders orderbook_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19933,7 +19928,7 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- TOC entry 2849 (class 2606 OID 16515)
+-- TOC entry 2849 (class 2606 OID 24707)
 -- Name: fills orderbook_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19942,7 +19937,7 @@ ALTER TABLE ONLY public.fills
 
 
 --
--- TOC entry 2844 (class 2606 OID 16520)
+-- TOC entry 2844 (class 2606 OID 24712)
 -- Name: account_stake_in_outcome resolution_windows_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19951,7 +19946,7 @@ ALTER TABLE ONLY public.account_stake_in_outcome
 
 
 --
--- TOC entry 2855 (class 2606 OID 16525)
+-- TOC entry 2855 (class 2606 OID 24717)
 -- Name: total_stake_in_outcomes resolution_windows_pkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19959,7 +19954,7 @@ ALTER TABLE ONLY public.total_stake_in_outcomes
     ADD CONSTRAINT resolution_windows_pkey FOREIGN KEY (market_id, round) REFERENCES public.resolution_windows(market_id, round);
 
 
--- Completed on 2020-08-10 00:14:45 CEST
+-- Completed on 2020-07-20 15:28:23 CEST
 
 --
 -- PostgreSQL database dump complete
