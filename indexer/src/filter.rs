@@ -2,19 +2,20 @@
 use near_primitives::{
     receipt::Receipt,
     transaction::{ExecutionOutcome, ExecutionStatus, SignedTransaction},
-    views
+    views,
+    types
 };
-use near_indexer;
+use near_indexer::streamer::streamer::Outcome;
 
 const FLUX_FUNGIBLE_RECEIVER_ID: String = "FluxFungibleContract".to_string();
 const FLUX_PROTOCOL_RECEIVER_ID: String = "FluxProtocolContract".to_string();
 
 
-pub fn isValidFluxTransfer(outcome: &near_indexer::streamer::streamer::Outcome ) -> bool {
+pub fn isValidFluxTransfer(outcome: &Outcome ) -> bool {
     match outcome {
-        near_indexer::streamer::streamer::Outcome::Receipt(views::ExecutionOutcomeWithIdView) => true,
+        Outcome::Receipt(views::ExecutionOutcomeWithIdView) => true,
         _ => return false
-    }
+    };
 
     match outcome.status {
         ExecutionStatus::SuccessValue(_) => true,
@@ -30,7 +31,7 @@ pub fn isValidFluxTransfer(outcome: &near_indexer::streamer::streamer::Outcome )
 }
 
 // TODO: Return success value
-pub async fn processTransfer(outcome: &near_indexer::streamer::streamer::Outcome) -> bool {
+pub async fn processTransfer(outcome: &Outcome) -> bool {
     // Is the log going to be the best processing mechanism?
     return match outcome.outcome.logs.r#type {
         "market_creation" => createMarketHandler(&outcome).await,
@@ -39,14 +40,14 @@ pub async fn processTransfer(outcome: &near_indexer::streamer::streamer::Outcome
     };
 }
 
-async fn createMarketHandler(outcome: &near_indexer::streamer::streamer::Outcome) -> bool{
+async fn createMarketHandler(outcome: &Outcome) -> bool{
     println!("creating Market! {:?}", outcome);
     return true;
     // Put state in postgres table
     // Return
 }
 
-async fn placeOrderHandler(outcome: &near_indexer::streamer::streamer::Outcome) -> bool {
+async fn placeOrderHandler(outcome: &Outcome) -> bool {
     println!("order placed! {:?}", outcome);
     return true;
     // Put state in postgres table
