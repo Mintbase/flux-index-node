@@ -1,14 +1,14 @@
-use postgres::{Client, NoTls};
+use postgres::{Client, NoTls, Error};
 
-struct DbUtils {
-	client: Client
+pub fn main() -> Result<(), Error> {
+	let mut client = Client::connect("host=localhost sslmode=disable user=flux dbname=flux password=flux", NoTls)?;
+
+	for row in client.query("SELECT * FROM markets", &[])? {
+		println!("");
+		let description: String = row.get("description");
+		println!("row: {:?}", description);
+
+	};
+
+    Ok(())
 }
-
-// impl DbUtils {
-
-// 	pub fn connect(self) {
-// 		let mut client = Client::connect("host=localhost user=flux password=flux", NoTls)?;
-// 		println!("{:?}", client);
-// 		println!("this is logging");
-// 	}
-// }

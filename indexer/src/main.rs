@@ -10,7 +10,6 @@ mod configs;
 mod db_utils;
 
 async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) {
-    // db_utils::connect();
 
     while let Some(block) = stream.recv().await {
         println!("");
@@ -195,32 +194,34 @@ async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) 
 }
 
 fn main() {
+    db_utils::main();
+
     // We use it to automatically search the for root certificates to perform HTTPS calls
     // (sending telemetry and downloading genesis)
-    openssl_probe::init_ssl_cert_env_vars();
+    // openssl_probe::init_ssl_cert_env_vars();
 
-    let opts: Opts = Opts::parse();
+    // let opts: Opts = Opts::parse();
 
-    let home_dir =
-        opts.home_dir.unwrap_or(std::path::PathBuf::from(near_indexer::get_default_home()));
+    // let home_dir =
+    //     opts.home_dir.unwrap_or(std::path::PathBuf::from(near_indexer::get_default_home()));
 
-    match opts.subcmd {
-        SubCommand::Run => {
-            let indexer = near_indexer::Indexer::new(Some(&home_dir));
-            let stream = indexer.streamer();
-            actix::spawn(listen_blocks(stream));
-            indexer.start();
-        }
-        SubCommand::Init(config) => near_indexer::init_configs(
-            &home_dir,
-            config.chain_id.as_ref().map(AsRef::as_ref),
-            config.account_id.as_ref().map(AsRef::as_ref),
-            config.test_seed.as_ref().map(AsRef::as_ref),
-            config.num_shards,
-            config.fast,
-            config.genesis.as_ref().map(AsRef::as_ref),
-            config.download,
-            config.download_genesis_url.as_ref().map(AsRef::as_ref),
-        ),
-    }
+    // match opts.subcmd {
+    //     SubCommand::Run => {
+    //         let indexer = near_indexer::Indexer::new(Some(&home_dir));
+    //         let stream = indexer.streamer();
+    //         actix::spawn(listen_blocks(stream));
+    //         indexer.start();
+    //     }
+    //     SubCommand::Init(config) => near_indexer::init_configs(
+    //         &home_dir,
+    //         config.chain_id.as_ref().map(AsRef::as_ref),
+    //         config.account_id.as_ref().map(AsRef::as_ref),
+    //         config.test_seed.as_ref().map(AsRef::as_ref),
+    //         config.num_shards,
+    //         config.fast,
+    //         config.genesis.as_ref().map(AsRef::as_ref),
+    //         config.download,
+    //         config.download_genesis_url.as_ref().map(AsRef::as_ref),
+    //     ),
+    // }
 }
