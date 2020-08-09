@@ -1,62 +1,55 @@
 // TODO: Probably better typing to be used here
 use near_primitives::{
     receipt::Receipt,
-    transaction::{ExecutionOutcome, ExecutionStatus, SignedTransaction}
+    transaction::{ExecutionOutcome, ExecutionStatus, SignedTransaction},
+    views
 };
+use near_indexer;
 
 const FLUX_FUNGIBLE_RECEIVER_ID: String = "FluxFungibleContract".to_string();
 const FLUX_PROTOCOL_RECEIVER_ID: String = "FluxProtocolContract".to_string();
 
-pub fn isSuccessfulReceipt(mut receipt: Receipt) -> bool {
-    // If receipt status != success, ignore
-    return match receipt.outcome.status {
-        ExecutionStatus::SuccessValue(_) => true,
+
+pub fn isValidFluxTransfer(outcome: &near_indexer::streamer::streamer::Outcome ) -> bool {
+    match outcome {
+        near_indexer::streamer::streamer::Outcome::Receipt(views::ExecutionOutcomeWithIdView) => true,
         _ => return false
     }
-}
 
-pub fn isFluxTransfer(mut transaction: Transaction ) -> bool {
-    // If transaction receiver is not a flux contract, ignore
-    return match transaction.transaction.receiver_id {
+    match outcome.status {
+        ExecutionStatus::SuccessValue(_) => true,
+        _ => return false
+    };
+
+    match outcome.outcome.receiver_id {
         FLUX_PROTOCOL_RECEIVER_ID => true,
         FLUX_FUNGIBLE_RECEIVER_ID => true,
-        _ => false
-    }
+        _ => return false
+    };
+    return true;
 }
 
-pub async fn processTransfer(mut receipt: Receipt, mut transaction: Transaction) {
+// TODO: Return success value
+pub async fn processTransfer(outcome: &near_indexer::streamer::streamer::Outcome) -> bool {
     // Is the log going to be the best processing mechanism?
-    match receipt.outcome.logs {
-        "create market" => createMarketHandler(receipt, transaction).await,
-        "create Account" => createAccountHandler(),
-        "get Balance" => getBalanceHandler(),
-        "place Order" => placeOrderHandler(),
-        "set Allowance" => setAllowanceHandler(),
-        _ => return
-    }
+    return match outcome.outcome.logs.r#type {
+        "market_creation" => createMarketHandler(&outcome).await,
+        "order_placed" => placeOrderHandler(&outcome).await,
+        _ => false
+    };
 }
 
-async fn createMarketHandler(receipt: Receipt, transaction: Transaction) {
+async fn createMarketHandler(outcome: &near_indexer::streamer::streamer::Outcome) -> bool{
+    println!("creating Market! {:?}", outcome);
+    return true;
     // Put state in postgres table
     // Return
 }
 
-async fn createAccountHandler(receipt: Receipt, transaction: Transaction) {
+async fn placeOrderHandler(outcome: &near_indexer::streamer::streamer::Outcome) -> bool {
+    println!("order placed! {:?}", outcome);
+    return true;
     // Put state in postgres table
     // Return
 }
 
-async fn getBalanceHandler(receipt: Receipt, transaction: Transaction) {
-    // Put state in postgres table
-    // Return
-}
-
-async fn placeOrderHandler(receipt: Receipt, transaction: Transaction) {
-    // Put state in postgres table
-    // Return
-}
-
-async fn setAllowanceHandler(receipt: Receipt, transaction: Transaction) {
-    // Put state in postgres table
-    // Return
-}
