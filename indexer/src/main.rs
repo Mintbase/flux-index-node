@@ -194,8 +194,8 @@ async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) 
 }
 
 fn main() {
-    db_utils::read_db();
-    db_utils::write_db();
+    // db_utils::read_db();
+    // db_utils::write_db();
 
     // We use it to automatically search the for root certificates to perform HTTPS calls
     // (sending telemetry and downloading genesis)
