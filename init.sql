@@ -5,7 +5,7 @@
 -- Dumped from database version 12.3 (Debian 12.3-1.pgdg100+1)
 -- Dumped by pg_dump version 12.2
 
--- Started on 2020-08-10 00:14:44 CEST
+-- Started on 2020-08-11 20:43:52 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -114,10 +114,10 @@ ALTER SEQUENCE public.fills_id_seq OWNED BY public.fills.id;
 --
 
 CREATE TABLE public.markets (
-    id bigint NOT NULL,
-    description character varying(300) NOT NULL,
-    extra_info character varying(500),
-    creator character varying(100) NOT NULL,
+    id numeric NOT NULL,
+    description text NOT NULL,
+    extra_info text,
+    creator text NOT NULL,
     creation_date timestamp with time zone NOT NULL,
     end_date_time timestamp with time zone NOT NULL,
     outcomes smallint NOT NULL,
@@ -19789,7 +19789,7 @@ ALTER TABLE ONLY public.accounts
 
 
 --
--- TOC entry 2832 (class 2606 OID 16454)
+-- TOC entry 2832 (class 2606 OID 16536)
 -- Name: markets markets_pkey1; Type: CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19852,7 +19852,7 @@ ALTER TABLE ONLY public.fills
 
 
 --
--- TOC entry 2850 (class 2606 OID 16470)
+-- TOC entry 2850 (class 2606 OID 16530)
 -- Name: markets accounts_account_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19888,7 +19888,7 @@ ALTER TABLE ONLY public.orders
 
 
 --
--- TOC entry 2854 (class 2606 OID 16490)
+-- TOC entry 2854 (class 2606 OID 16537)
 -- Name: resolution_windows markets_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19897,7 +19897,7 @@ ALTER TABLE ONLY public.resolution_windows
 
 
 --
--- TOC entry 2851 (class 2606 OID 16495)
+-- TOC entry 2851 (class 2606 OID 16542)
 -- Name: orderbooks markets_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19906,7 +19906,7 @@ ALTER TABLE ONLY public.orderbooks
 
 
 --
--- TOC entry 2846 (class 2606 OID 16500)
+-- TOC entry 2846 (class 2606 OID 16547)
 -- Name: claimable_if_valid marketst_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: flux
 --
 
@@ -19959,7 +19959,7 @@ ALTER TABLE ONLY public.total_stake_in_outcomes
     ADD CONSTRAINT resolution_windows_pkey FOREIGN KEY (market_id, round) REFERENCES public.resolution_windows(market_id, round);
 
 
--- Completed on 2020-08-10 00:14:45 CEST
+-- Completed on 2020-08-11 20:43:53 CEST
 
 --
 -- PostgreSQL database dump complete
