@@ -1,9 +1,18 @@
+#[macro_use]
+extern crate diesel;
+
 use std::env;
 use std::io;
 use actix;
 use clap::derive::Clap;
 use tokio::sync::mpsc;
-use tokio_postgres::{NoTls, Error};
+
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, Pool},
+};
+use std::error::Error;
+use tokio_diesel::*;
 use configs::{init_logging, Opts, SubCommand};
 
 mod configs;
@@ -12,28 +21,20 @@ mod utils;
 
 use near_indexer;
 
-pub async fn db_connect() -> Result<tokio_postgres::Client, Error> {
-	let (client, connection) =
-	tokio_postgres::connect("host=localhost user=flux password=flux", NoTls).await?;
-
-	tokio::spawn(async move {
-		if let Err(e) = connection.await {
-			eprintln!("connection error: {}", e);
-		}
-	});
-
-	Ok(client)
+pub async fn db_connect() -> Pool<ConnectionManager<PgConnection>> {
+    let manager =
+        ConnectionManager::<PgConnection>::new("postgres://flux:flux@localhost/flux");
+    Pool::builder().build(manager).unwrap_or_else(|_| panic!("Error connecting to db"))
 }
 
 async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) {
-    let mut client = match db_connect().await {
-        Ok(client) => client,
-        _ => return
-    };
+    let pool = db_connect().await;
 
     while let Some(block) = stream.recv().await {
         for outcome in block.outcomes {
-            utils::continue_if_valid_flux_receipt(outcome, &mut client).await;
+            let receipt = utils::continue_if_valid_flux_receipt(outcome);
+            if receipt.is_none() { continue; }
+            utils::process_logs(&pool, receipt.unwrap()).await;
         }
     }
 }

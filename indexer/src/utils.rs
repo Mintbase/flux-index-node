@@ -3,38 +3,39 @@ use near_indexer::near_primitives::{
 };
 use near_indexer::Outcome;
 use serde_json::{Result, Value};
-use tokio_postgres::Client;
+
+use diesel::{
+    prelude::*,
+    r2d2::{ConnectionManager, Pool},
+};
 
 mod db_utils;
 // const FLUX_FUNGIBLE_RECEIVER_ID: String = "FluxFungibleContract".to_string();
 // const FLUX_PROTOCOL_RECEIVER_ID: String = "FluxProtocolContract".to_string();
 
-pub async fn continue_if_valid_flux_receipt(outcome: Outcome, client: &mut Client) {
-    println!("getere2");
+pub fn continue_if_valid_flux_receipt(outcome: Outcome) -> Option<ExecutionOutcomeWithIdView> {
 
     let receipt: ExecutionOutcomeWithIdView = match outcome {
         Outcome::Receipt(outcome) => outcome,
-        _ => return
+        _ => return None
     };
     
-    if receipt.outcome.executor_id != "flux_protocol.test.near" {return}
+    if receipt.outcome.executor_id != "flux_protocol.test.near" {return None}
 
     let res = match &receipt.outcome.status {
         ExecutionStatusView::SuccessValue(res) => res,
-        _ => return 
+        _ => return None
     };
-    
-    process_logs(receipt, client).await;
-    
+
+    return Some(receipt);
+        
 }
 
-pub async  fn process_logs(receipt: ExecutionOutcomeWithIdView, client: &mut Client) -> Result<()> {
-    println!("getere3");
+pub async fn process_logs(pool: &Pool<ConnectionManager<PgConnection>>, receipt: ExecutionOutcomeWithIdView) -> Result<()> {
     
     for log in receipt.outcome.logs {
-        println!("getere4 {:?}", log);
         let json: Value = serde_json::from_str(log.as_str())?;
-        db_utils::execute_log(client, &json["type"], &json["params"]).await;
+        db_utils::execute_log(pool, &json["type"], &json["params"]).await;
     }
 
     Ok(())
