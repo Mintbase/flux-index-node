@@ -97,7 +97,7 @@ router.post("/best_prices", (req, res) => {
 	})
 });
 
-
+//todo rewrite for last blockheight changes
 router.post("/last_filled_prices", (req, res) => {
 	const {pool, body} = req;
 

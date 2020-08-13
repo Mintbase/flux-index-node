@@ -16,7 +16,7 @@ use tokio_diesel::*;
 use configs::{init_logging, Opts, SubCommand};
 
 mod configs;
-mod utils;
+mod db;
 
 
 use near_indexer;
@@ -32,9 +32,9 @@ async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) 
 
     while let Some(block) = stream.recv().await {
         for outcome in block.outcomes {
-            let receipt = utils::continue_if_valid_flux_receipt(outcome);
+            let receipt = db::continue_if_valid_flux_receipt(outcome);
             if receipt.is_none() { continue; }
-            utils::process_logs(&pool, receipt.unwrap()).await;
+            db::process_logs(&pool, receipt.unwrap()).await;
         }
     }
 }

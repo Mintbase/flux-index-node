@@ -22,7 +22,7 @@ table! {
 		api_source, 
 		validity_bond_claimed
 	) {
-		id -> Numeric,
+		id -> Bigint,
 		description -> Text,
 		extra_info -> Text,
 		creator -> Text,
@@ -42,5 +42,56 @@ table! {
 		affiliate_fee_percentage-> SmallInt,
 		api_source-> Text,
 		validity_bond_claimed -> Bool,
+	}
+}
+
+table!{
+	orders (
+		id, 
+		creator, 
+		outcome, 
+		market_id, 
+		spend, 
+		shares, 
+		price,
+		filled, 
+		shares_filled, 
+		affiliate_account_id, 
+		creation_time, 
+	) {
+		id -> Numeric,
+		creator -> Text,
+		outcome -> BigInt,
+		market_id -> Bigint,
+		spend -> Numeric,
+		shares -> Numeric,
+		price -> Numeric,
+		filled -> Numeric,
+		shares_filled -> Numeric,
+		affiliate_account_id -> Text,
+		creation_time -> Timestamp,
+		closed -> Bool,
+    }
+}
+
+table!{
+	fills (
+		order_id, 
+		market_id, 
+		outcome, 
+		amount, 
+		fill_time, 
+		owner, 
+		price,
+		block_height
+	) {
+		order_id -> Numeric,
+		market_id -> BigInt,
+		outcome -> BigInt,
+		amount -> Numeric,
+		fill_time -> Timestamp,
+		owner -> Text,
+		price -> Numeric,
+		block_height -> Numeric,
     }
 }
