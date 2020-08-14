@@ -139,3 +139,23 @@ table!{
 		round -> BigInt,
     }
 }
+
+table!{
+	accounts (
+		id,
+		affiliate_earnings
+	) {
+		id -> Text,
+		affiliate_earnings -> Numeric,
+    }
+}
+
+table!{
+	claimed_markets (
+		market_id,
+		account_id
+	) {
+		market_id -> BigInt,
+		account_id -> Text,
+    }
+}

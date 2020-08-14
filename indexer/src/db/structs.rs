@@ -232,3 +232,34 @@ impl AccountStakeInOutcome {
         }
     }
 }
+
+#[derive(Insertable, Clone, Debug)]
+pub struct Account {
+    id: String,
+    affiliate_earnings: BigDecimal,
+}
+
+impl Account {
+    pub fn from_args(args: &Value) -> Self {
+        Self {
+            id: args["affiliate"].as_str().unwrap().to_string(),
+            affiliate_earnings: BigDecimal::from_str(&args["earned"].as_str().unwrap().to_string()).unwrap(),
+            
+        }
+    }
+}
+
+#[derive(Insertable, Clone, Debug)]
+pub struct ClaimedMarket {
+    market_id: i64,
+    account_id: String,
+}
+
+impl ClaimedMarket {
+    pub fn from_args(args: &Value) -> Self {
+        Self {
+            market_id: val_to_i64(&args["market_id"]),
+            account_id: args["account_id"].as_str().unwrap().to_string(),
+        }
+    }
+}
