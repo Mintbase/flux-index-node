@@ -1,0 +1,1 @@
+env NEAR_ENV=local near --keyPath ~/.near/localnet/validator_key.json call $1.test.near finalize_market '{"market_id": "'$2'"}' --gas 300000000000000 --accountId test.near

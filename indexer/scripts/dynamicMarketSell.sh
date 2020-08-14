@@ -1,1 +1,1 @@
-env NEAR_ENV=local near --keyPath ~/.near/localnet/validator_key.json call $1.test.near dynamic_market_sell '{"market_id": "0", "outcome": "0", "shares": "1"}' --gas 300000000000000 --accountId test.near
+env NEAR_ENV=local near --keyPath ~/.near/localnet/validator_key.json call $1.test.near dynamic_market_sell '{"market_id": "0", "outcome": "1", "shares": "10"}' --gas 300000000000000 --accountId test.near

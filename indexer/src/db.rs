@@ -23,7 +23,7 @@ pub fn continue_if_valid_flux_receipt(outcome: Outcome) -> Option<ExecutionOutco
         _ => return None
     };
     
-    if receipt.outcome.executor_id != "12345.test.near" {return None}
+    if receipt.outcome.executor_id != "mymann.test.near" {return None}
 
     let res = match &receipt.outcome.status {
         ExecutionStatusView::SuccessValue(res) => res,
@@ -62,14 +62,66 @@ pub async fn execute_log(pool: &Pool<ConnectionManager<PgConnection>>, log_type:
             add_fill(pool, params).await;
         }
 
-    } else if log_type == &"order_filled".to_string() ||log_type == &"order_partly_filled".to_string() {
+    } 
+    else if log_type == &"order_filled".to_string() ||log_type == &"order_partly_filled".to_string() {
         add_fill(pool, params).await;
         fill_order(pool, params).await;
-    } else if log_type == &"order_closed".to_string() {
+    } 
+    else if log_type == &"order_closed".to_string() {
         close_order(pool, params).await;
-    } else if log_type == &"sold_fill_from_order".to_string() {
+    } 
+    else if log_type == &"sold_fill_from_order".to_string() {
         update_order_after_sell(pool, params).await;
     }
+    else if log_type == &"increased_claimable_if_valid".to_string() {
+        add_to_claimable_if_valid(pool, params).await;
+    }
+    else if log_type == &"new_resolution_window".to_string() {
+        add_resolution_window(pool, params).await;
+    }
+    else if log_type == &"market_resoluted".to_string() {
+        add_stake(pool, params).await;
+        set_resolute_market(pool, params).await;
+    } 
+    else if log_type == &"staked_on_resolution".to_string() {
+        add_stake(pool, params).await;
+    }
+    else if log_type == &"resolution_disputed".to_string() {
+        add_stake(pool, params).await;
+        set_dispute_market(pool, params).await;
+    }
+    else if log_type == &"staked_on_dispute".to_string() {
+        add_stake(pool, params).await;
+    }
+    else if log_type == &"market_finalized".to_string() {
+        set_finalized_market(pool, params).await;
+
+    }
+}
+
+pub async fn add_stake(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let stake: structs::AccountStakeInOutcome = structs::AccountStakeInOutcome::from_args(params);
+
+    println!("{:?}", stake);
+
+    diesel::insert_into(schema::account_stake_in_outcomes::table)
+        .values(stake)
+        .execute_async(pool)
+        .await
+        .expect("something went wrong while trying to insert staake");
+}
+
+
+pub async fn add_resolution_window(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let resolution_window: structs::ResolutionWindow = structs::ResolutionWindow::from_args(params);
+
+    println!("{:?}", resolution_window);
+
+    diesel::insert_into(schema::resolution_windows::table)
+        .values(resolution_window)
+        .execute_async(pool)
+        .await
+        .expect("something went wrong while trying to insert resolution_window");
 }
 
 pub async fn add_market(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
@@ -82,6 +134,48 @@ pub async fn add_market(pool: &Pool<ConnectionManager<PgConnection>>, params: &V
         .execute_async(pool)
         .await
         .expect("something went wrong while trying to insert into markets");
+}
+
+pub async fn set_resolute_market(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let market_id = structs::val_to_i64(&params["market_id"]);
+    diesel::update(
+        schema::markets::table
+            .filter(schema::markets::dsl::id.eq(market_id))
+    )
+    .set(schema::markets::dsl::resoluted.eq(true))
+    .execute_async(pool)
+    .await
+    .expect("updated market resolute failed");
+}
+
+pub async fn set_dispute_market(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let market_id = structs::val_to_i64(&params["market_id"]);
+    diesel::update(
+        schema::markets::table
+            .filter(schema::markets::dsl::id.eq(market_id))
+    )
+    .set(schema::markets::dsl::disputed.eq(true))
+    .execute_async(pool)
+    .await
+    .expect("updated market resolute failed");
+}
+
+pub async fn set_finalized_market(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let market_id = structs::val_to_i64(&params["market_id"]);
+    let winning_outcome = structs::val_to_i16(&params["winning_outcome"]);
+
+    diesel::update(
+        schema::markets::table
+            .filter(schema::markets::dsl::id.eq(market_id))
+    )
+
+    .set((
+        schema::markets::dsl::finalized.eq(true),
+        schema::markets::dsl::winning_outcome.eq(winning_outcome)
+    ))
+    .execute_async(pool)
+    .await
+    .expect("updated market resolute failed");
 }
 
 pub async fn add_order(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value, log_type: &Value) {
@@ -134,6 +228,8 @@ pub async fn update_order_after_sell(pool: &Pool<ConnectionManager<PgConnection>
     .expect("filling order failed");
 }
 
+
+
 pub async fn fill_order(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
     let order_id = BigDecimal::from_str(&params["order_id"].as_str().unwrap().to_string()).unwrap();
     let outcome = structs::val_to_i64(&params["outcome"]);
@@ -173,4 +269,16 @@ pub async fn close_order(pool: &Pool<ConnectionManager<PgConnection>>, params: &
     .execute_async(pool)
     .await
     .expect("canceling order failed");
+}
+
+pub async fn add_to_claimable_if_valid(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let claimable_if_valid: structs::ClaimableIfValid = structs::ClaimableIfValid::from_args(params);
+
+    println!("{:?}", claimable_if_valid);
+
+    diesel::insert_into(schema::claimable_if_valids::table)
+        .values(claimable_if_valid)
+        .execute_async(pool)
+        .await
+        .expect("something went wrong while trying to insert into markets");
 }

@@ -7,14 +7,14 @@ use super::schema::*;
 
 fn string_value_to_date(date_val: &Value) -> NaiveDateTime {
     let date_str = date_val.as_str().unwrap().to_string();
-    println!("dat str  {:?}", date_str);
-
+    
     let date_int = date_str.parse::<i64>().unwrap();
-
+    println!("dat str  {:?}     {:?}", date_str, NaiveDateTime::from_timestamp(date_int / 1000, 0));
+    
     return NaiveDateTime::from_timestamp(date_int / 1000, 0);
 }
 
-fn val_to_i16(val: &Value) -> i16 {
+pub fn val_to_i16(val: &Value) -> i16 {
     let s = val.as_str().unwrap().to_string();
     return s.parse::<i16>().unwrap();
 }
@@ -22,6 +22,13 @@ fn val_to_i16(val: &Value) -> i16 {
 pub fn val_to_i64(val: &Value) -> i64 {
     let s = val.as_str().unwrap().to_string();
     return s.parse::<i64>().unwrap();
+}
+
+pub fn val_to_opt_i64(val: &Value) -> Option<i64> {
+    return match val.as_str() {
+        Some(s) => Some(s.to_string().parse::<i64>().unwrap()),
+        _ => None
+    };
 }
 
 fn val_vec_to_str(val_vec: &Vec<Value>) -> Vec<String> {
@@ -147,7 +154,6 @@ pub struct Fill {
 }
 
 impl Fill {
-
     pub fn from_args(args: &Value) -> Self {
         let creation_date = SystemTime::now();
 
@@ -160,6 +166,69 @@ impl Fill {
             owner: args["account_id"].as_str().unwrap().to_string(),
             price: BigDecimal::from_str(&args["price"].as_str().unwrap().to_string()).unwrap(),
             block_height: BigDecimal::from_str(&args["block_height"].as_str().unwrap().to_string()).unwrap(),
+        }
+    }
+}
+
+#[derive(Insertable, Clone, Debug)]
+pub struct ClaimableIfValid {
+    market_id: i64,
+    account_id: String,
+    claimable: BigDecimal
+}
+
+impl ClaimableIfValid {
+    pub fn from_args(args: &Value) -> Self {
+        Self {
+            claimable: BigDecimal::from_str(&args["claimable_if_valid"].as_str().unwrap().to_string()).unwrap(),
+            market_id: val_to_i64(&args["market_id"]),
+            account_id: args["sender"].as_str().unwrap().to_string(),
+        }
+    }
+}
+
+
+#[derive(Insertable, Clone, Debug)]
+pub struct ResolutionWindow {
+    market_id: i64,
+    round: i64,
+    bond_size: BigDecimal,
+    outcome: Option<i64>,
+    end_time: NaiveDateTime
+}
+
+impl ResolutionWindow {
+    
+    pub fn from_args(args: &Value) -> Self {
+        let end_date_time = string_value_to_date(&args["end_time"]);
+
+        Self {
+            market_id: val_to_i64(&args["market_id"]),
+            round: val_to_i64(&args["round"]),
+            bond_size: BigDecimal::from_str(&args["required_bond_size"].as_str().unwrap().to_string()).unwrap(),
+            outcome: None,
+            end_time: end_date_time
+        }
+    }
+}
+
+#[derive(Insertable, Clone, Debug)]
+pub struct AccountStakeInOutcome {
+    account_id: String,
+    market_id: i64,
+    outcome: i64,
+    round: i64,
+    stake: BigDecimal,
+}
+
+impl AccountStakeInOutcome {
+    pub fn from_args(args: &Value) -> Self {
+        Self {
+            account_id: args["sender"].as_str().unwrap().to_string(),
+            market_id: val_to_i64(&args["market_id"]),
+            round: val_to_i64(&args["round"]),
+            stake: BigDecimal::from_str(&args["staked"].as_str().unwrap().to_string()).unwrap(),
+            outcome: val_to_i64(&args["outcome"]),
         }
     }
 }

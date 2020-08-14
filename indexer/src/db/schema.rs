@@ -95,3 +95,47 @@ table!{
 		block_height -> Numeric,
     }
 }
+
+table!{
+	resolution_windows (
+		market_id,
+		round,
+		bond_size,
+		outcome,
+		end_time,
+	) {
+		market_id -> BigInt,
+		round -> BigInt,
+		bond_size -> Numeric,
+		outcome -> BigInt,
+		end_time -> Timestamp,
+	}
+}
+
+table!{
+	claimable_if_valids (
+		account_id,
+		market_id,
+		claimable
+	) {
+		account_id -> Text,
+		market_id -> BigInt,
+		claimable -> Numeric,
+    }
+}
+
+table!{
+	account_stake_in_outcomes (
+		account_id,
+		market_id,
+		outcome,
+		stake,
+		round
+	) {
+		account_id -> Text,
+		market_id -> BigInt,
+		outcome -> BigInt,
+		stake -> Numeric,
+		round -> BigInt,
+    }
+}
