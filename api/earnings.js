@@ -8,11 +8,11 @@ router.post("/get_trading_earnings", (req, res) => {
 
 	const query = `
 		SELECT 
-			fills.outcome, 
-			SUM(fills.amount / price * 100) 
-		FROM fills 
-		WHERE fills.owner = $1 AND fills.market_id = $2 
-		GROUP BY fills.outcome;
+			orders.outcome, 
+			SUM(orders.shares_filled * 100) 
+		FROM orders 
+		WHERE orders.creator = $1 AND orders.market_id = $2 
+		GROUP BY orders.outcome;
 	`;
 	
 	const values = [accountId, marketId]

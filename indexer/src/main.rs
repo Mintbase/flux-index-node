@@ -23,7 +23,7 @@ use near_indexer;
 
 pub async fn db_connect() -> Pool<ConnectionManager<PgConnection>> {
     let manager =
-        ConnectionManager::<PgConnection>::new("postgres://flux:flux@localhost/flux");
+        ConnectionManager::<PgConnection>::new("postgres://flux:flux@localhost:5432/flux");
     Pool::builder().build(manager).unwrap_or_else(|_| panic!("Error connecting to db"))
 }
 

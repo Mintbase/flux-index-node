@@ -164,7 +164,7 @@ impl Fill {
             amount: BigDecimal::from_str(&args["shares_filling"].as_str().unwrap().to_string()).unwrap(),
             fill_time: creation_date,
             owner: args["account_id"].as_str().unwrap().to_string(),
-            price: BigDecimal::from_str(&args["price"].as_str().unwrap().to_string()).unwrap(),
+            price: BigDecimal::from_str(&args["fill_price"].as_str().unwrap().to_string()).unwrap(),
             block_height: BigDecimal::from_str(&args["block_height"].as_str().unwrap().to_string()).unwrap(),
         }
     }

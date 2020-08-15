@@ -75,30 +75,20 @@ router.post("/market_prices", (req, res) => {
 
 router.post("/last_filled_prices", (req, res) => {
 	const {pool, body} = req;
-
+	console.log(body)
 	const query = `
-		SELECT 
-			f1.outcome, 
-			f1.market_id,
-			f1.price
-		FROM fills f1
+		SELECT fills.outcome, MAX(fills.price) AS price FROM fills 
 		JOIN (
 			SELECT 
-				fills.market_id,
-				fills.outcome,
-				MAX(fills.fill_time) as fill_time
-			FROM fills
-			JOIN (
-				SELECT * FROM markets
-				WHERE markets.id = $1
-			) markets
-			ON fills.market_id = markets.id
-			WHERE fills.fill_time < to_timestamp(${new Date().getTime()} / 1000)
-			GROUP BY fills.market_id, fills.outcome
-		) f2 ON f1.market_id = f2.market_id
-			AND f1.outcome = f2.outcome
-			AND f1.fill_time = f2.fill_time
-		;
+				market_id, 
+				MAX(block_height) as block_height
+			FROM fills 
+			WHERE market_id = $1 
+			AND block_height = block_height
+			GROUP BY market_id
+		) f2
+		ON fills.block_height = f2.block_height
+		GROUP BY fills.outcome;
 	`;
 
 	const values = [body.marketId];
@@ -111,6 +101,7 @@ router.post("/last_filled_prices", (req, res) => {
 
 		const rows = results.rows;
 		const lastFillPricePerOutcome = {}
+		console.log(rows)
 		rows.forEach(lastFill => {
 			lastFillPricePerOutcome[lastFill.outcome] = lastFill.price;
 		});
