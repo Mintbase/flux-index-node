@@ -25,5 +25,29 @@ services:
     volumes: 
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - db:/var/lib/postgresql/data
+  indexer:
+    build:
+      context: ./indexer
+    image: flux-index-node
+    ports: 
+      - "8080:8080"
+    environment:
+            # TODO: Fill in 
+    network:
+      - flux-network    
+    depends_on:
+      - db
+  fullnode:
+    image: nearprotocol/nearcore_test
+    restart: unless-stopped
+    network:
+      - flux-network     
+    ports:
+      - "8000:8000"
+    environment:
+        # TODO: Fill in 
 volumes:
     db:
+networks:
+  flux-network:
+    driver: bridge

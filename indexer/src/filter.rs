@@ -26,25 +26,25 @@ pub fn isValidFluxTransfer(outcome: &Outcome ) -> bool {
 }
 
 // // TODO: Return success value
-// pub async fn processTransfer(outcome: &Outcome) -> bool {
-//     // Is the log going to be the best processing mechanism?
-//     return match outcome.receipt.logs.r#type {
-//         "market_creation" => createMarketHandler(&outcome).await,
-//         "order_placed" => placeOrderHandler(&outcome).await,
-//         _ => false
-//     };
-// }
+pub async fn processTransfer(outcome: &Outcome) -> bool {
+     // Is the log going to be the best processing mechanism?
+     return match outcome.receipt.logs.r#type {
+         "market_creation" => createMarketHandler(&outcome).await,
+         "order_placed" => placeOrderHandler(&outcome).await,
+         _ => false
+     };
+ }
 
-// async fn createMarketHandler(outcome: &Outcome) -> bool{
-//     println!("creating Market! {:?}", outcome);
-//     return true;
-//     // Put state in postgres table
-//     // Return
-// }
+async fn createMarketHandler(outcome: &Outcome) -> bool{
+     println!("creating Market! {:?}", outcome);
+     return true;
+     // Put state in postgres table
+     // Return
+}
 
-// async fn placeOrderHandler(outcome: &Outcome) -> bool {
-//     println!("order placed! {:?}", outcome);
-//     return true;
+async fn placeOrderHandler(outcome: &Outcome) -> bool {
+     println!("order placed! {:?}", outcome);
+     return true;
 //     // Put state in postgres table
 //     // Return
 // }

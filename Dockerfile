@@ -9,3 +9,4 @@ CMD npm start
 
 # psql
 RUN apt-get update && apt-get install -y postgresql-client
+
