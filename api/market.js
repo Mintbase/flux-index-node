@@ -35,6 +35,8 @@ router.post("/get", (req, res) => {
 router.post("/market_prices", (req, res) => {
 	const {pool, body} = req;
 
+	const marketQuery = `SELECT outcomes FROM markets WHERE markets.id = $1`;
+
 	const query = `
 		SELECT 
 			outcome,
@@ -48,34 +50,48 @@ router.post("/market_prices", (req, res) => {
 
 	const values = [body.marketId];
 	
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error) 
-      res.status(404).json(error)
+	pool.query(marketQuery, values, (error , marketRes) => {
+		if (error) {
+			console.error(error) 
+			res.status(404).json(error)
 		}
 
-		const marketPriceDepthPerOutcome = {}
+		if (marketRes.fields.length === 0) return res.status(400).json({"error": "invalid market id"});
+		let market = marketRes.rows[0];
 
-		const rows = results.rows;
-		
-		for (let i = 0; i < rows.length; i++) {
-			for (let x = 0; x < rows.length; x++) {
-				let outcomeX = rows[x].outcome;
-				if (x === i) continue;
-				if(!marketPriceDepthPerOutcome[outcomeX]) marketPriceDepthPerOutcome[outcomeX] = {marketPrice: 100, depth: rows[i].amount};
-				else if (marketPriceDepthPerOutcome[outcomeX].depth > rows[i].amount) {
-					marketPriceDepthPerOutcome[outcomeX].depth = rows[i].amount;
-				}
-				marketPriceDepthPerOutcome[outcomeX].marketPrice -= rows[i].best_price;
+		pool.query(query, values, (error, results) => {
+			if (error) {
+				console.error(error) 
+				res.status(404).json(error)
 			}
-		}
-    res.status(200).json(marketPriceDepthPerOutcome)
+	
+			const marketPriceDepthPerOutcome = {}
+	
+			const rows = results.rows;
+			
+			for (let i = 0; i < rows.length; i++) {
+				const marketData = rows[i];
+				for (let outcome = 0; outcome < market.outcomes; outcome++) {
+					if (outcome == marketData.outcome) continue;
+					if (!marketPriceDepthPerOutcome[outcome]) {
+						marketPriceDepthPerOutcome[outcome] = {
+							marketPrice: 100 - marketData.best_price,
+							depth: marketData.amount,
+						}
+					} else {
+						marketPriceDepthPerOutcome[outcome].marketPrice -= marketData.best_price;
+						if (marketPriceDepthPerOutcome[outcome].depth > marketData.amount) marketPriceDepthPerOutcome[outcome].depth = marketData.amount
+					}
+				}
+			}
+			res.status(200).json(marketPriceDepthPerOutcome)
+		})
 	})
 });
 
 router.post("/last_filled_prices", (req, res) => {
 	const {pool, body} = req;
-	console.log(body)
+
 	const query = `
 		SELECT fills.outcome, MAX(fills.price) AS price FROM fills 
 		JOIN (
@@ -101,7 +117,7 @@ router.post("/last_filled_prices", (req, res) => {
 
 		const rows = results.rows;
 		const lastFillPricePerOutcome = {}
-		console.log(rows)
+
 		rows.forEach(lastFill => {
 			lastFillPricePerOutcome[lastFill.outcome] = lastFill.price;
 		});
@@ -141,12 +157,11 @@ router.post("/get_share_balances_for_user", (req, res) => {
 
 	const query = `
 		SELECT
-			price,
-			SUM(shares_filled) owned_shares,
-			outcome
-		FROM orders
-		WHERE orders.creator = $1 AND market_id = $2 AND shares_filled > 0
-		GROUP BY price, outcome;
+			outcome,
+			balance,
+			(spent / balance) avg_price_per_share
+		FROM account_share_balances
+		WHERE account_id = $1 AND market_id = $2
 	`;
 
 	const values = [body.accountId, body.marketId]

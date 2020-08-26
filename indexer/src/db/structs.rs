@@ -130,7 +130,7 @@ impl Order {
             outcome: val_to_i64(&args["outcome"]),
             market_id: val_to_i64(&args["market_id"]),
             spend: BigDecimal::from_str(&args["spend"].as_str().unwrap().to_string()).unwrap(),
-            shares: BigDecimal::from_str(&args["amt_of_shares"].as_str().unwrap().to_string()).unwrap(),
+            shares: BigDecimal::from_str(&args["shares"].as_str().unwrap().to_string()).unwrap(),
             price: BigDecimal::from_str(&args["price"].as_str().unwrap().to_string()).unwrap(),
             filled: BigDecimal::from_str(&args["filled"].as_str().unwrap().to_string()).unwrap(),
             shares_filled: BigDecimal::from_str(&args["shares_filled"].as_str().unwrap().to_string()).unwrap(),
@@ -260,6 +260,29 @@ impl ClaimedMarket {
         Self {
             market_id: val_to_i64(&args["market_id"]),
             account_id: args["account_id"].as_str().unwrap().to_string(),
+        }
+    }
+}
+
+#[derive(Insertable, Clone, Debug)]
+pub struct AccountShareBalance {
+    market_id: i64,
+    account_id: String,
+    outcome: i64,
+    balance: BigDecimal,
+    to_spend: BigDecimal,
+    spent: BigDecimal,
+}
+
+impl AccountShareBalance {
+    pub fn from_args(args: &Value) -> Self {
+        Self {
+            market_id: val_to_i64(&args["market_id"]),
+            account_id: args["account_id"].as_str().unwrap().to_string(),
+            outcome: val_to_i64(&args["outcome"]),
+            balance: BigDecimal::from_str(&args["balance"].as_str().unwrap().to_string()).unwrap(),
+            to_spend: BigDecimal::from_str(&args["to_spend"].as_str().unwrap().to_string()).unwrap(),
+            spent: BigDecimal::from_str(&args["spent"].as_str().unwrap().to_string()).unwrap(),
         }
     }
 }

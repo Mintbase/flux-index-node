@@ -159,3 +159,21 @@ table!{
 		account_id -> Text,
     }
 }
+
+table!{
+	account_share_balances (
+		market_id,
+		account_id,
+		outcome,
+		balance,
+		to_spend,
+		spent
+	) {
+		market_id -> BigInt,
+		account_id -> Text,
+		outcome -> BigInt,
+		balance -> Numeric,
+		to_spend -> Numeric,
+		spent -> Numeric,
+    }
+}

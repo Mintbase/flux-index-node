@@ -153,7 +153,6 @@ router.post("/last_filled_prices", (req, res) => {
 
 router.post("/get_resoluting", async (req, res) => {
 	const {pool, body} = req;
-	console.log("getting resoluting markets")
 
 	let limit = body.limit || 20;
 	let limitString = `LIMIT $1`;
@@ -200,7 +199,6 @@ router.post("/get_resoluting", async (req, res) => {
 
 router.post("/get_resolution_state", async (req, res) => {
 	const {pool, body} = req;
-	console.log("getting resoluting markets")
 
 	let limit = body.limit || 20;
 	let limitString = `LIMIT $1`;

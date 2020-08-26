@@ -1,3 +1,3 @@
 curl -X POST -H "Content-Type: application/json" \
  -d '{"marketId": 2 }' \
- localhost:3001/market/get
+ https://api.flux.market/market/get

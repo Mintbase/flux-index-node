@@ -18,7 +18,7 @@ app.use(helmet())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cors({credentials: true, origin: "*"}))
-console.log("connectec")
+
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header('Access-Control-Allow-Methods', 'DELETE, PUT, GET, POST, OPTION');
@@ -33,12 +33,10 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get("/health_check", (req, res, next) => {
-  console.log("get1");
   res.status(200).send("success");
 });
 
 app.use("/markets", (req, res, next) => {
-  console.log("get2");
   req.pool = pool;
   next();
 }, markets);

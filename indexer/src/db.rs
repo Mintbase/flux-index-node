@@ -8,6 +8,7 @@ use bigdecimal::BigDecimal;
 use std::str::FromStr;
 
 use diesel::{
+    pg::upsert::*,
     prelude::*,
     r2d2::{ConnectionManager, Pool},
 };
@@ -23,7 +24,8 @@ pub fn continue_if_valid_flux_receipt(outcome: Outcome) -> Option<ExecutionOutco
         _ => return None
     };
     
-    if receipt.outcome.executor_id != "u1f92b_u1f680.flux-dev" {return None}
+    // if receipt.outcome.executor_id != "u1f92b_u1f680.flux-dev" {return None}
+    if receipt.outcome.executor_id != "badhjsss.test.near" {return None}
 
     let res: Option<&String> = match &receipt.outcome.status {
         ExecutionStatusView::SuccessValue(res) => Some(res),
@@ -39,6 +41,7 @@ pub async fn process_logs(pool: &Pool<ConnectionManager<PgConnection>>, receipt:
     
     for log in receipt.outcome.logs {
         let json: Value = serde_json::from_str(log.as_str())?;
+        println!("type: {:?} args: {:?}",  &json["type"], &json["params"]);
         execute_log(pool, &json["type"], &json["params"]).await;
     }
 
@@ -65,16 +68,16 @@ pub async fn execute_log(pool: &Pool<ConnectionManager<PgConnection>>, log_type:
         }
 
     } 
-    else if log_type == &"order_filled".to_string() ||log_type == &"order_partly_filled".to_string() {
+    else if log_type == &"updated_user_balance".to_string() {
+        update_user_balance(pool, params).await;
+    }
+    else if log_type == &"order_filled".to_string() {
         add_fill(pool, params).await;
         fill_order(pool, params).await;
     } 
     else if log_type == &"order_closed".to_string() {
         close_order(pool, params).await;
     } 
-    else if log_type == &"sold_fill_from_order".to_string() {
-        update_order_after_sell(pool, params).await;
-    }
     else if log_type == &"increased_claimable_if_valid".to_string() {
         add_to_claimable_if_valid(pool, params).await;
     }
@@ -196,6 +199,28 @@ pub async fn add_affiliate_earnings(pool: &Pool<ConnectionManager<PgConnection>>
     .expect("updated market resolute failed");
 }
 
+pub async fn update_user_balance(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
+    let account_share_balance: structs::AccountShareBalance = structs::AccountShareBalance::from_args(params);
+    println!("");
+    println!("acc share b {:?}", account_share_balance);
+    println!("");
+
+    let balance = BigDecimal::from_str(&params["balance"].as_str().unwrap().to_string()).unwrap();
+    let to_spend = BigDecimal::from_str(&params["to_spend"].as_str().unwrap().to_string()).unwrap();
+    let spent = BigDecimal::from_str(&params["spent"].as_str().unwrap().to_string()).unwrap();
+
+    diesel::insert_into(schema::account_share_balances::table)
+    .values(account_share_balance)
+    .on_conflict(on_constraint("account_share_balances_pkey"))
+    .do_update()
+    .set((
+        schema::account_share_balances::dsl::balance.eq(balance), schema::account_share_balances::dsl::to_spend.eq(to_spend), schema::account_share_balances::dsl::spent.eq(spent)
+    ))
+    .execute_async(pool)
+    .await
+    .expect("updating user balance failed");
+}
+
 pub async fn set_dispute_market(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
     let market_id = structs::val_to_i64(&params["market_id"]);
     diesel::update(
@@ -247,36 +272,6 @@ pub async fn add_fill(pool: &Pool<ConnectionManager<PgConnection>>, params: &Val
         .expect("something went wrong while trying to insert into fills");
 }
 
-pub async fn update_order_after_sell(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
-    let order_id = BigDecimal::from_str(&params["order_id"].as_str().unwrap().to_string()).unwrap();
-    let outcome = structs::val_to_i64(&params["outcome"]);
-    let market_id = structs::val_to_i64(&params["market_id"]);
-
-    let updated_spend = BigDecimal::from_str(&params["updated_spend"].as_str().unwrap().to_string()).unwrap();
-    let updated_filled = BigDecimal::from_str(&params["updated_filled"].as_str().unwrap().to_string()).unwrap();
-    let updated_amt_of_shares = BigDecimal::from_str(&params["updated_amt_of_shares"].as_str().unwrap().to_string()).unwrap();
-    let updated_shares_filled = BigDecimal::from_str(&params["updated_amt_of_shares"].as_str().unwrap().to_string()).unwrap();
-
-
-    diesel::update(
-        schema::orders::table
-            .filter(
-                schema::orders::dsl::market_id.eq(market_id).and(schema::orders::dsl::id.eq(order_id)).and(schema::orders::dsl::outcome.eq(outcome))
-            )
-    )
-    .set((
-        schema::orders::dsl::spend.eq(updated_spend),
-        schema::orders::dsl::filled.eq(updated_filled),
-        schema::orders::dsl::shares.eq(updated_amt_of_shares),
-        schema::orders::dsl::shares_filled.eq(updated_shares_filled),
-    ))
-    .execute_async(pool)
-    .await
-    .expect("filling order failed");
-}
-
-
-
 pub async fn fill_order(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
     let order_id = BigDecimal::from_str(&params["order_id"].as_str().unwrap().to_string()).unwrap();
     let outcome = structs::val_to_i64(&params["outcome"]);
@@ -300,7 +295,7 @@ pub async fn fill_order(pool: &Pool<ConnectionManager<PgConnection>>, params: &V
 }
 
 pub async fn close_order(pool: &Pool<ConnectionManager<PgConnection>>, params: &Value) {
-    let order_id = BigDecimal::from_str(&params["id"].as_str().unwrap().to_string()).unwrap();
+    let order_id = BigDecimal::from_str(&params["order_id"].as_str().unwrap().to_string()).unwrap();
     let outcome = structs::val_to_i64(&params["outcome"]);
     let market_id = structs::val_to_i64(&params["market_id"]);
 
