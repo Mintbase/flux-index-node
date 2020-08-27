@@ -37,7 +37,7 @@ router.post("/get", (req, res) => {
 		FROM orders
 		WHERE market_id = $1 AND orders.closed = false
 		GROUP BY outcome, price
-		ORDER BY price;
+		ORDER BY price DESC;
 	`;
 
 	const values = [body.marketId]
