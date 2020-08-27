@@ -5,7 +5,7 @@
 -- Dumped from database version 12.4 (Debian 12.4-1.pgdg100+1)
 -- Dumped by pg_dump version 12.2
 
--- Started on 2020-08-27 10:07:48 CEST
+-- Started on 2020-08-27 10:32:25 CEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -264,10 +264,6 @@ ALTER TABLE ONLY public.fills ALTER COLUMN block_height SET DEFAULT nextval('pub
 --
 
 COPY public.account_share_balances (market_id, account_id, outcome, balance, spent, to_spend) FROM stdin;
-0	test.near	0	2000	75000	75000
-0	test.near	1	2000	75000	75000
-0	test.near	2	1000	25000	25000
-0	test.near	3	1000	25000	74000
 \.
 
 
@@ -319,12 +315,6 @@ COPY public.claimed_markets (market_id, account_id) FROM stdin;
 --
 
 COPY public.fills (order_id, market_id, outcome, amount, fill_time, owner, price, block_height) FROM stdin;
-0	0	0	1000	2020-08-25 16:42:36.671975+00	test.near	50	460924
-0	0	1	1000	2020-08-25 16:42:36.715764+00	test.near	50	460924
-1	0	0	1000	2020-08-25 16:51:21.490622+00	test.near	25	461778
-1	0	1	1000	2020-08-25 16:51:21.521162+00	test.near	25	461778
-0	0	2	1000	2020-08-25 16:51:21.552323+00	test.near	25	461778
-1	0	3	1000	2020-08-25 16:51:21.591946+00	test.near	25	461778
 \.
 
 
@@ -335,7 +325,6 @@ COPY public.fills (order_id, market_id, outcome, amount, fill_time, owner, price
 --
 
 COPY public.markets (id, description, extra_info, creator, creation_date, end_date_time, outcomes, outcome_tags, categories, winning_outcome, resoluted, resolute_bond, filled_volume, disputed, finalized, creator_fee_percentage, resolution_fee_percentage, affiliate_fee_percentage, api_source, validity_bond_claimed) FROM stdin;
-0	test		test.near	2020-08-25 16:42:20.537074+00	2476-03-24 18:59:50+00	4	{1,2,3,4}	{}	\N	f	5000000000000000000	0	f	f	1	100	50		f
 \.
 
 
@@ -356,13 +345,6 @@ COPY public.orderbooks (market_id, outcome) FROM stdin;
 --
 
 COPY public.orders (id, creator, outcome, market_id, spend, shares, price, filled, shares_filled, affiliate_account_id, creation_time, closed) FROM stdin;
-0	test.near	0	0	50000	1000	50	50000	1000		2020-08-25 16:42:32.138252+00	t
-0	test.near	1	0	50000	1000	50	50000	1000		2020-08-25 16:42:36.708066+00	t
-0	test.near	3	0	24000	1000	24	0	0		2020-08-25 16:50:59.346893+00	f
-1	test.near	0	0	25000	1000	25	25000	1000		2020-08-25 16:50:47.244596+00	t
-1	test.near	1	0	25000	1000	25	25000	1000		2020-08-25 16:50:50.788714+00	t
-0	test.near	2	0	25000	1000	25	25000	1000		2020-08-25 16:50:55.321069+00	t
-1	test.near	3	0	50000	1000	50	25000	1000		2020-08-25 16:51:21.585534+00	f
 \.
 
 
@@ -394,7 +376,6 @@ flux-dev	250000000000000000	5000000000000000000
 --
 
 COPY public.resolution_windows (market_id, round, bond_size, end_time, outcome) FROM stdin;
-0	0	5000000000000000000	2476-03-24 18:59:50+00	\N
 \.
 
 
@@ -569,7 +550,7 @@ ALTER TABLE ONLY public.account_stake_in_outcomes
     ADD CONSTRAINT resolution_windows_fkey FOREIGN KEY (market_id, round) REFERENCES public.resolution_windows(market_id, round);
 
 
--- Completed on 2020-08-27 10:07:49 CEST
+-- Completed on 2020-08-27 10:32:26 CEST
 
 --
 -- PostgreSQL database dump complete
