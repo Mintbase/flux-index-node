@@ -36,6 +36,7 @@ router.post("/get", (req, res) => {
 			SUM(shares - shares_filled) as depth
 		FROM orders
 		WHERE market_id = $1 AND orders.closed = false
+		ORDER BY price
 		GROUP BY outcome, price;
 	`;
 
