@@ -208,7 +208,7 @@ router.post("/get_resoluting", async (req, res) => {
 		SELECT 
 			COUNT(*) total_markets
 		FROM markets
-		WHERE markets.end_date_time > to_timestamp(${new Date().getTime()} / 1000) ${whereString && whereString};
+		WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000);
 	`;
 
 	pool.query(totalQuery, [], (error, results) => {
