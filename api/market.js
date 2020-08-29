@@ -16,7 +16,7 @@ router.post("/get", (req, res) => {
 		ON markets.id = orders.market_id
 		WHERE markets.id = $1
 		GROUP BY markets.id
-		ORDER BY filled
+		ORDER BY volume
 		LIMIT 1;
 	`;
 

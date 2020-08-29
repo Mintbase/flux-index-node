@@ -4,6 +4,7 @@ const {pool} = require('./config')
 const cors = require('cors');
 const rateLimit = require("express-rate-limit")
 const compression = require("compression");
+const handleDBEvent = require("./DBEventHandler");
 const helmet = require("helmet");
 const markets = require("./api/markets");
 const market = require("./api/market");
@@ -25,6 +26,16 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
+pool.connect((err, client, release) => {
+  client.query('LISTEN update_markets');
+  client.query('LISTEN update_orders');
+  
+  client.on('notification', async(data) => {
+    handleDBEvent(data);
+  })
+})
+
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
