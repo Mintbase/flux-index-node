@@ -178,39 +178,57 @@ router.post("/get_resoluting", async (req, res) => {
 	const values = [limit, offset];
 
 	const query = `
-	SELECT 
-		SUM(orders.filled) as volume,
-		markets.*,
-		extract(epoch from markets.creation_date) as creation_timestamp,
-		extract(epoch from markets.end_date_time) as end_timestamp,
-		res_win.resolution_state,
-		res_win.resolution_round_end_time
-	FROM markets
-	JOIN (
 		SELECT 
-			MAX(resolution_windows.round) AS resolution_state, 
-			resolution_windows.end_time AS resolution_round_end_time,
-			resolution_windows.market_id
-		FROM resolution_windows
-		GROUP BY resolution_windows.end_time, resolution_windows.market_id
-	) res_win
-	ON markets.id = res_win.market_id
-	LEFT JOIN orders 
-	ON markets.id = orders.market_id
-	WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000) AND markets.finalized = false
-	GROUP BY markets.id, res_win.resolution_state, res_win.resolution_round_end_time
-	ORDER BY volume
-	${limitString}
-	${offsetString};
-`;
+			SUM(orders.filled) as volume,
+			markets.*,
+			extract(epoch from markets.creation_date) as creation_timestamp,
+			extract(epoch from markets.end_date_time) as end_timestamp,
+			res_win.resolution_state,
+			res_win.resolution_round_end_time
+		FROM markets
+		JOIN (
+			SELECT 
+				MAX(resolution_windows.round) AS resolution_state, 
+				resolution_windows.end_time AS resolution_round_end_time,
+				resolution_windows.market_id
+			FROM resolution_windows
+			GROUP BY resolution_windows.end_time, resolution_windows.market_id
+		) res_win
+		ON markets.id = res_win.market_id
+		LEFT JOIN orders 
+		ON markets.id = orders.market_id
+		WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000) AND markets.finalized = false
+		GROUP BY markets.id, res_win.resolution_state, res_win.resolution_round_end_time
+		ORDER BY volume
+		${limitString}
+		${offsetString};
+	`;
 
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+	const totalQuery = `
+		SELECT 
+			COUNT(*) total_markets
+		FROM markets
+		WHERE markets.end_date_time > to_timestamp(${new Date().getTime()} / 1000) ${whereString && whereString};
+	`;
+
+	pool.query(totalQuery, [], (error, results) => {
+		if (error) {
+			console.error(error)
+			res.status(404).json(error)
 		}
-    res.status(200).json(results.rows)
-	})
+
+		const total_markets = results.rows[0] ? results.rows[0].total_markets : 0;
+		pool.query(query, values, (error, results) => {
+			if (error) {
+				console.error(error)
+				res.status(404).json(error)
+			}
+			res.status(200).json({count: total_markets, data: results.rows})
+		})
+	
+	});
+
+
 });
 
 
