@@ -34,14 +34,31 @@ router.post("/get", async (req, res) => {
 		${limitString} ${offsetString}
 		;
 	`;
+	const totalQuery = `
+		SELECT 
+			COUNT(*) total_markets
+		FROM markets
+		WHERE markets.end_date_time > to_timestamp(${new Date().getTime()} / 1000) ${whereString && whereString};
+	`;
 
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+	pool.query(totalQuery, [], (error, results) => {
+		if (error) {
+			console.error(error)
+			res.status(404).json(error)
 		}
-    res.status(200).json(results.rows)
-	})
+
+		const total_markets = results.rows[0] ? results.rows[0].total_markets : 0;
+
+		pool.query(query, values, (error, results) => {
+		  if (error) {
+			  console.error(error)
+			  res.status(404).json(error)
+		  }
+		  
+		  res.status(200).json({count: total_markets, data: results.rows})
+	  })
+	});
+
 });
 
 router.post("/best_prices", (req, res) => {
