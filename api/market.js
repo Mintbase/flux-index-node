@@ -7,7 +7,7 @@ router.post("/get", (req, res) => {
 	
 	const query = `
 		SELECT 
-			SUM(orders.filled) as filled,
+			SUM(orders.filled) as volume,
 			markets.*,
 			extract(epoch from markets.creation_date) as creation_timestamp,
 			extract(epoch from markets.end_date_time) as end_timestamp
