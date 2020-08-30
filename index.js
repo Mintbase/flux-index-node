@@ -71,7 +71,6 @@ app.use("/earnings", (req, res, next) => {
 }, earnings);
 
 io.of("/markets").on('connect', (socket) => {
-  console.log("connected to markets query");
   pool.connect((err, client, release) => {
     client.query('LISTEN update_markets');
     
@@ -82,9 +81,6 @@ io.of("/markets").on('connect', (socket) => {
 });
 
 io.of("/marketDetails").on('connect', (socket) => {
-  const ns = socket.nsp;
-  console.log("connected to market details query");
-
   pool.connect((err, client, release) => {
     client.query('LISTEN update_orders');
     
