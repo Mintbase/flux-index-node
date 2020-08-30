@@ -14,6 +14,9 @@ const user = require("./api/user");
 const earnings = require("./api/earnings");
 
 const app = express()
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+
 app.use(compression())
 app.use(helmet())
 app.use(bodyParser.json())
@@ -26,16 +29,6 @@ app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
-
-pool.connect((err, client, release) => {
-  client.query('LISTEN update_markets');
-  client.query('LISTEN update_orders');
-  
-  client.on('notification', async(data) => {
-    handleDBEvent(data);
-  })
-})
-
 
 const limiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
@@ -77,6 +70,32 @@ app.use("/earnings", (req, res, next) => {
   next();
 }, earnings);
 
-app.listen(process.env.PORT || 3000, () => {
+io.of("/markets").on('connect', (socket) => {
+  console.log("connected to markets query");
+  pool.connect((err, client, release) => {
+    client.query('LISTEN update_markets');
+    
+    client.on('notification', async(data) => {
+      handleDBEvent(socket, data);
+    })
+  })
+});
+
+io.of("/marketDetails").on('connect', (socket) => {
+  const ns = socket.nsp;
+  console.log("connected to market details query");
+
+  pool.connect((err, client, release) => {
+    client.query('LISTEN update_orders');
+    
+    client.on('notification', async(data) => {
+      handleDBEvent(socket, data);
+    })
+  })
+});
+
+
+
+http.listen(process.env.PORT || 3000, () => {
   console.log(`Server listening`)
 })

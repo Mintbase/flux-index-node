@@ -1,18 +1,16 @@
-const events = require("events");
-
-const em = new events.EventEmitter();
-
-const DBEventHandler = data => {
+const DBEventHandler = (socket, data) => {
     switch (data.channel) {
+        // TODO: JSON parse payload
         case "update_markets":
-            em.emit("UpdateMarkets", data.payload)
+            socket.broadcast.emit("UpdateMarkets", JSON.parse(data.payload))
             break;
         case "update_orders":
-            em.emit("UpdateOrders", data.payload)
+            socket.broadcast.emit("UpdateOrders", JSON.parse(data.payload))
             break;
         default:
             console.log("unidentified event found", data.channel)
     }
+
 }
 
 module.exports = DBEventHandler;
