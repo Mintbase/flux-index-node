@@ -30,7 +30,7 @@ pub async fn db_connect() -> Pool<ConnectionManager<PgConnection>> {
     Pool::builder().build(manager).unwrap_or_else(|_| panic!("Error connecting to db"))
 }
 
-async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::BlockResponse>) {
+async fn listen_blocks(mut stream: mpsc::Receiver<near_indexer::StreamerMessage>) {
     let pool = db_connect().await;
 
     eprintln!("listening to blocks");
