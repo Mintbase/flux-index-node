@@ -72,21 +72,41 @@ app.use("/earnings", (req, res, next) => {
 
 io.of("/markets").on('connect', (socket) => {
   pool.connect((err, client, release) => {
+    if (err) { 
+      console.log(err);
+      return;
+    }
     client.query('LISTEN update_markets');
     
     client.on('notification', async(data) => {
       handleDBEvent(socket, data);
     })
+    
+    release();
+
   })
 });
 
 io.of("/marketDetails").on('connect', (socket) => {
   pool.connect((err, client, release) => {
+    if (err) { 
+      console.log(err);
+      return;
+    }
+    
     client.query('LISTEN update_orders');
     
     client.on('notification', async(data) => {
+      console.log("notified of order change")
       handleDBEvent(socket, data);
     })
+
+    socket.on("disconnect", () => {
+      client.query('UNLISTEN update_orders');
+
+    })
+    
+    release();
   })
 });
 
