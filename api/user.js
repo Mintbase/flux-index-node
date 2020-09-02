@@ -14,12 +14,12 @@ router.post("/get_affiliate_earnings", (req, res) => {
 	const values = [body.accountId]
 
 	pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
-    res.status(200).json(results.rows);
+		res.status(200).json(results.rows);
 	})
 }); 
 
@@ -38,12 +38,12 @@ router.post("/get_open_orders", (req, res) => {
 	const values = [body.accountId]
 
 	pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
-    res.status(200).json(results.rows);
+		res.status(200).json(results.rows);
 	})
 }); 
 
@@ -58,12 +58,12 @@ router.post("/get_order_history", (req, res) => {
 	const values = [body.accountId]
 
 	pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
-    res.status(200).json(results.rows);
+    	res.status(200).json(results.rows);
 	})
 });
 
@@ -80,12 +80,12 @@ router.post("/get_finalized_participated_markets", (req, res) => {
 	const values = [body.accountId]
 
 	pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
-    res.status(200).json(results.rows);
+    	res.status(200).json(results.rows);
 	})
 });
 

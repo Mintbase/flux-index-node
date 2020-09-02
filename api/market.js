@@ -53,7 +53,7 @@ router.post("/market_prices", (req, res) => {
 	pool.query(marketQuery, values, (error , marketRes) => {
 		if (error) {
 			console.error(error) 
-			res.status(404).json(error)
+			return res.status(404).json(error)
 		}
 
 		if (marketRes.fields.length === 0) return res.status(400).json({"error": "invalid market id"});
@@ -62,7 +62,7 @@ router.post("/market_prices", (req, res) => {
 		pool.query(query, values, (error, results) => {
 			if (error) {
 				console.error(error) 
-				res.status(404).json(error)
+				return res.status(404).json(error)
 			}
 	
 			const marketPriceDepthPerOutcome = {}
@@ -84,7 +84,7 @@ router.post("/market_prices", (req, res) => {
 					}
 				}
 			}
-			res.status(200).json(marketPriceDepthPerOutcome)
+			return res.status(200).json(marketPriceDepthPerOutcome)
 		})
 	})
 });
@@ -109,10 +109,10 @@ router.post("/last_filled_prices", (req, res) => {
 
 	const values = [body.marketId];
 	
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+ 	pool.query(query, values, (error, results) => {
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
 		const rows = results.rows;
@@ -121,7 +121,7 @@ router.post("/last_filled_prices", (req, res) => {
 		rows.forEach(lastFill => {
 			lastFillPricePerOutcome[lastFill.outcome] = lastFill.price;
 		});
-    res.status(200).json(lastFillPricePerOutcome)
+		return res.status(200).json(lastFillPricePerOutcome)
 	})
 });
 
@@ -168,9 +168,9 @@ router.post("/get_share_balances_for_user", (req, res) => {
 	
   pool.query(query, values, (error, results) => {
     if (error) {
-      console.error(error)
-      res.status(404).json(error)
-		}
+		console.error(error)
+		return res.status(404).json(error)
+	}
 
     res.status(200).json(results.rows);
 	})
@@ -194,9 +194,9 @@ router.post("/get_avg_prices_for_date", (req, res) => {
 
 	pool.query(query, values, (error, results) => {
     if (error) {
-      console.error(error)
-      res.status(404).json(error)
-		}
+		console.error(error)
+		return res.status(404).json(error)
+	}
 
     res.status(200).json(results.rows);
 	})

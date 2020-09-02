@@ -44,16 +44,16 @@ router.post("/get", async (req, res) => {
 	pool.query(totalQuery, [], (error, results) => {
 		if (error) {
 			console.error(error)
-			res.status(404).json(error)
+			return res.status(404).json(error)
 		}
 
 		const total_markets = results.rows[0] ? results.rows[0].total_markets : 0;
 
 		pool.query(query, values, (error, results) => {
-		  if (error) {
-			  console.error(error)
-			  res.status(404).json(error)
-		  }
+			if (error) {
+				console.error(error)
+				return res.status(404).json(error)
+			}
 		  
 		  res.status(200).json({count: total_markets, data: results.rows})
 	  })
@@ -93,10 +93,11 @@ router.post("/best_prices", (req, res) => {
 		GROUP BY orders.market_id, orders.outcome;
 	`;
 	
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+  	pool.query(query, values, (error, results) => {
+	
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
 		const marketPricePerOutcome = {
@@ -110,7 +111,7 @@ router.post("/best_prices", (req, res) => {
 			marketPricePerOutcome[outcomes.market_id][outcomes.outcome] = outcomes.best_price;
 			marketPricePerOutcome.total += parseInt(outcomes.best_price);
 		});
-    res.status(200).json(marketPricePerOutcome)
+		res.status(200).json(marketPricePerOutcome)
 	})
 });
 
@@ -152,19 +153,19 @@ router.post("/last_filled_prices", (req, res) => {
 		GROUP BY fills.market_id, fills.outcome;
 	`;
 	
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+	pool.query(query, values, (error, results) => {
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
-		const rows = results.rows;
-		const lastFillPricePerOutcome = {}
-		rows.forEach(lastFill => {
-			if (!lastFillPricePerOutcome[lastFill.market_id]) lastFillPricePerOutcome[lastFill.market_id] = {};
-			lastFillPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
-		});
-    res.status(200).json(lastFillPricePerOutcome)
+			const rows = results.rows;
+			const lastFillPricePerOutcome = {}
+			rows.forEach(lastFill => {
+				if (!lastFillPricePerOutcome[lastFill.market_id]) lastFillPricePerOutcome[lastFill.market_id] = {};
+				lastFillPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
+			});
+		res.status(200).json(lastFillPricePerOutcome)
 	})
 });
 
@@ -214,16 +215,16 @@ router.post("/get_resoluting", async (req, res) => {
 	pool.query(totalQuery, [], (error, results) => {
 		if (error) {
 			console.error(error)
-			res.status(404).json(error)
+			return res.status(404).json(error)
 		}
 
 		const total_markets = results.rows[0] ? results.rows[0].total_markets : 0;
 		pool.query(query, values, (error, results) => {
 			if (error) {
 				console.error(error)
-				res.status(404).json(error)
+				return res.status(404).json(error)
 			}
-			res.status(200).json({count: total_markets, data: results.rows})
+			return res.status(200).json({count: total_markets, data: results.rows})
 		})
 	});
 
@@ -241,29 +242,29 @@ router.post("/get_resolution_state", async (req, res) => {
 	const values = [limit, offset];
 
 	const query = `
-	SELECT 
-		markets.id as market_id,
-		SUM(orders.filled) as volume,
-		total_stake_in_outcomes.outcome,
-		MAX(total_stake_in_outcomes.round) max_round
-	FROM markets
-	LEFT JOIN orders
-	ON markets.id = orders.market_id
-	RIGHT JOIN total_stake_in_outcomes
-	ON markets.id = total_stake_in_outcomes.market_id
-	WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000)
-	GROUP BY markets.id, total_stake_in_outcomes.outcome
-	ORDER BY volume
-	${limitString}
-	${offsetString};
-`;
+		SELECT 
+			markets.id as market_id,
+			SUM(orders.filled) as volume,
+			total_stake_in_outcomes.outcome,
+			MAX(total_stake_in_outcomes.round) max_round
+		FROM markets
+		LEFT JOIN orders
+		ON markets.id = orders.market_id
+		RIGHT JOIN total_stake_in_outcomes
+		ON markets.id = total_stake_in_outcomes.market_id
+		WHERE markets.end_date_time <= to_timestamp(${new Date().getTime()} / 1000)
+		GROUP BY markets.id, total_stake_in_outcomes.outcome
+		ORDER BY volume
+		${limitString}
+		${offsetString};
+	`;
 
-  pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+  	pool.query(query, values, (error, results) => {
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
-    res.status(200).json(results.rows)
+    	res.status(200).json(results.rows)
 	})
 });
 

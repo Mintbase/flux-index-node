@@ -37,7 +37,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get("/health_check", (req, res, next) => {
-  res.status(200).send("success");
+  return res.status(200).send("success");
 });
 
 app.use("/markets", (req, res, next) => {

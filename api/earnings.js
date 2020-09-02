@@ -18,12 +18,13 @@ router.post("/get_trading_earnings", (req, res) => {
 	const values = [accountId, marketId]
 
 	pool.query(query, values, (error, results) => {
-    if (error) {
-      console.error(error)
-      res.status(404).json(error)
+			
+		if (error) {
+			console.error(error)
+			return res.status(404).json(error)
 		}
 
-    res.status(200).json(results.rows);
+    	res.status(200).json(results.rows);
 	})
 });
 
