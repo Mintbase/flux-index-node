@@ -37,7 +37,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get("/health_check", (req, res, next) => {
-  return res.status(200).send("success");
+  res.status(200).send("success");
 });
 
 app.use("/markets", (req, res, next) => {
@@ -109,6 +109,8 @@ io.of("/marketDetails").on('connect', (socket) => {
     release();
   })
 });
+
+
 
 http.listen(process.env.PORT || 3000, () => {
   console.log(`Server listening`)
