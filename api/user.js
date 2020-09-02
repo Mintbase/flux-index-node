@@ -19,7 +19,7 @@ router.post("/get_affiliate_earnings", (req, res) => {
 			return res.status(404).json(error)
 		}
 
-		res.status(200).json(results.rows);
+		return res.status(200).json(results.rows);
 	})
 }); 
 
@@ -43,7 +43,7 @@ router.post("/get_open_orders", (req, res) => {
 			return res.status(404).json(error)
 		}
 
-		res.status(200).json(results.rows);
+		return res.status(200).json(results.rows);
 	})
 }); 
 
@@ -63,7 +63,7 @@ router.post("/get_order_history", (req, res) => {
 			return res.status(404).json(error)
 		}
 
-    	res.status(200).json(results.rows);
+    	return res.status(200).json(results.rows);
 	})
 });
 
@@ -85,7 +85,7 @@ router.post("/get_finalized_participated_markets", (req, res) => {
 			return res.status(404).json(error)
 		}
 
-    	res.status(200).json(results.rows);
+    	return res.status(200).json(results.rows);
 	})
 });
 

@@ -111,7 +111,7 @@ router.post("/best_prices", (req, res) => {
 			marketPricePerOutcome[outcomes.market_id][outcomes.outcome] = outcomes.best_price;
 			marketPricePerOutcome.total += parseInt(outcomes.best_price);
 		});
-		res.status(200).json(marketPricePerOutcome)
+		return res.status(200).json(marketPricePerOutcome)
 	})
 });
 
@@ -165,7 +165,7 @@ router.post("/last_filled_prices", (req, res) => {
 				if (!lastFillPricePerOutcome[lastFill.market_id]) lastFillPricePerOutcome[lastFill.market_id] = {};
 				lastFillPricePerOutcome[lastFill.market_id][lastFill.outcome] = lastFill.price;
 			});
-		res.status(200).json(lastFillPricePerOutcome)
+		return res.status(200).json(lastFillPricePerOutcome)
 	})
 });
 
@@ -264,7 +264,7 @@ router.post("/get_resolution_state", async (req, res) => {
 			console.error(error)
 			return res.status(404).json(error)
 		}
-    	res.status(200).json(results.rows)
+    	return res.status(200).json(results.rows)
 	})
 });
 

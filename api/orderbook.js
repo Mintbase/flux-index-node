@@ -22,7 +22,7 @@ router.post("/get_best", (req, res) => {
 			return res.status(404).json(error)
 		}
 
-		res.status(200).json(results.rows);
+		return res.status(200).json(results.rows);
 	})
 }); 
 
@@ -48,7 +48,7 @@ router.post("/get", (req, res) => {
 			return res.status(404).json(error)
 		}
 
-		res.status(200).json(results.rows);
+		return res.status(200).json(results.rows);
 	})
 }); 
 
