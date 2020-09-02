@@ -64,7 +64,11 @@ fn main() {
 
     match opts.subcmd {
         SubCommand::Run => {
-            let indexer = near_indexer::Indexer::new(Some(&home_dir));
+            let indexer_config = near_indexer::IndexerConfig {
+                home_dir,
+                sync_mode: near_indexer::SyncModeEnum::FromInterruption,
+            };
+            let indexer = near_indexer::Indexer::new(indexer_config);
             let stream = indexer.streamer();
             actix::spawn(listen_blocks(stream));
             indexer.start();

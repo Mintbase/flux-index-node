@@ -225,7 +225,6 @@ router.post("/get_resoluting", async (req, res) => {
 			}
 			res.status(200).json({count: total_markets, data: results.rows})
 		})
-	
 	});
 
 

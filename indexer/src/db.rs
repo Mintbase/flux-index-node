@@ -24,8 +24,7 @@ pub fn continue_if_valid_flux_receipt(outcome: Outcome) -> Option<ExecutionOutco
         _ => return None
     };
     
-    // if receipt.outcome.executor_id != "u1f92b_u1f680.flux-dev" {return None}
-    if receipt.outcome.executor_id != "badhjsss.test.near" {return None}
+    if receipt.outcome.executor_id != "u1f92b_u1f680.flux-dev" {return None}
 
     let res: Option<&String> = match &receipt.outcome.status {
         ExecutionStatusView::SuccessValue(res) => Some(res),
