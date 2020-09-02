@@ -37,7 +37,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 app.get("/health_check", (req, res, next) => {
-  return res.status(200).send("success");
+  res.status(200).send("success");
 });
 
 app.use("/markets", (req, res, next) => {
@@ -70,26 +70,27 @@ app.use("/earnings", (req, res, next) => {
   next();
 }, earnings);
 
-pool.connect((err, client, release) => {
-  if (err) {
-    console.log(err)
-    return
-  }
-  client.query('LISTEN update_markets');
-  client.query('LISTEN update_orders');
-  
-  io.of("/orders").on('connect', (socket) => { 
-    client.on('notification', async(data) => {
-      handleDBEvent(socket, data);
-    })
-  });
-  
-  io.of("/markets").on('connect', (socket) => {
+io.of("/markets").on('connect', (socket) => {
+  pool.connect((err, client, release) => {
+    client.query('LISTEN update_markets');
+    
     client.on('notification', async(data) => {
       handleDBEvent(socket, data);
     })
   })
 });
+
+io.of("/marketDetails").on('connect', (socket) => {
+  pool.connect((err, client, release) => {
+    client.query('LISTEN update_orders');
+    
+    client.on('notification', async(data) => {
+      handleDBEvent(socket, data);
+    })
+  })
+});
+
+
 
 http.listen(process.env.PORT || 3000, () => {
   console.log(`Server listening`)
