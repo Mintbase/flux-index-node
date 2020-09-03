@@ -1,6 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const {pool} = require('./config')
+const {pool, listener} = require('./config')
 const cors = require('cors');
 const rateLimit = require("express-rate-limit")
 const compression = require("compression");
@@ -70,46 +70,20 @@ app.use("/earnings", (req, res, next) => {
   next();
 }, earnings);
 
-io.of("/markets").on('connect', (socket) => {
-  pool.connect((err, client, release) => {
-    if (err) { 
-      console.log(err);
-      return;
-    }
-    client.query('LISTEN update_markets');
-    
-    client.on('notification', async(data) => {
-      handleDBEvent(socket, data);
-    })
-    
-    release();
+(async function connectListener() {
+  await listener.connect()
+  await client.query('LISTEN update_orders');
+  // await client.query('LISTEN update_markets');
 
+  console.log("starting wss")
+
+  io.on('connect', socket => {
+    console.log("new ws connection");
+    db.on("notification", message => {
+      handleDBEvent(socket, message);
+    })
   })
-});
-
-io.of("/marketDetails").on('connect', (socket) => {
-  pool.connect((err, client, release) => {
-    if (err) { 
-      console.log(err);
-      return;
-    }
-    
-    client.query('LISTEN update_orders');
-    
-    client.on('notification', async(data) => {
-      console.log("notified of order change")
-      handleDBEvent(socket, data);
-    })
-
-    socket.on("disconnect", () => {
-      client.query('UNLISTEN update_orders');
-
-    })
-    
-    release();
-  })
-});
-
+})()
 
 
 http.listen(process.env.PORT || 3000, () => {
